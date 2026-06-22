@@ -1,0 +1,341 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>H100 FP16 Tensor Core Utilization</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; color: #111827; background: #ffffff; }
+    h1 { font-size: 24px; margin: 0 0 8px; }
+    h2 { font-size: 18px; margin: 28px 0 12px; }
+    .grid-wrap { display: grid; grid-template-columns: repeat(auto-fit, minmax(620px, 1fr)); gap: 18px; }
+    .card { border: 1px solid #d1d5db; border-radius: 8px; padding: 8px; background: white; }
+    svg { width: 100%; height: auto; }
+    .axis { stroke: #111827; stroke-width: 1.2; }
+    .grid { stroke: #d1d5db; stroke-width: 0.8; stroke-dasharray: 3 4; }
+    .title { font-size: 15px; font-weight: 700; }
+    .tick { font-size: 11px; fill: #4b5563; }
+    .label { font-size: 12px; fill: #374151; }
+    .legend { font-size: 12px; fill: #111827; }
+    .annot { font-size: 10px; fill: #111827; }
+  </style>
+</head>
+<body>
+  <h1>H100 FP16 Tensor Core Utilization</h1>
+  <h2>Tensor Core Utilization</h2>
+  <div class="grid-wrap">
+    <div class="card"><svg viewBox="0 0 660 390" role="img" aria-label="non-causal, H=32, D=64">
+<text x="330.0" y="22" text-anchor="middle" class="title">non-causal, H=32, D=64</text>
+<line x1="68" y1="326" x2="642" y2="326" class="axis"/>
+<line x1="68" y1="42" x2="68" y2="326" class="axis"/>
+<line x1="68" y1="326.00" x2="642" y2="326.00" class="grid"/>
+<text x="60" y="330.00" text-anchor="end" class="tick">0</text>
+<line x1="68" y1="269.20" x2="642" y2="269.20" class="grid"/>
+<text x="60" y="273.20" text-anchor="end" class="tick">14</text>
+<line x1="68" y1="212.40" x2="642" y2="212.40" class="grid"/>
+<text x="60" y="216.40" text-anchor="end" class="tick">29</text>
+<line x1="68" y1="155.60" x2="642" y2="155.60" class="grid"/>
+<text x="60" y="159.60" text-anchor="end" class="tick">43</text>
+<line x1="68" y1="98.80" x2="642" y2="98.80" class="grid"/>
+<text x="60" y="102.80" text-anchor="end" class="tick">57</text>
+<line x1="68" y1="42.00" x2="642" y2="42.00" class="grid"/>
+<text x="60" y="46.00" text-anchor="end" class="tick">72</text>
+<rect x="75.00" y="213.43" width="18" height="112.57" fill="#2563eb" opacity="0.82"/>
+<text x="84.00" y="209.43" text-anchor="middle" class="annot">28.5</text>
+<title>FA-T S=128: 28.5%</title>
+<rect x="97.00" y="194.30" width="18" height="131.70" fill="#dc2626" opacity="0.82"/>
+<text x="106.00" y="190.30" text-anchor="middle" class="annot">33.3</text>
+<title>FA3 S=128: 33.3%</title>
+<text x="95.00" y="344" text-anchor="middle" class="tick">128</text>
+<rect x="149.29" y="180.06" width="18" height="145.94" fill="#2563eb" opacity="0.82"/>
+<text x="158.29" y="176.06" text-anchor="middle" class="annot">36.9</text>
+<title>FA-T S=256: 36.9%</title>
+<rect x="171.29" y="164.92" width="18" height="161.08" fill="#dc2626" opacity="0.82"/>
+<text x="180.29" y="160.92" text-anchor="middle" class="annot">40.7</text>
+<title>FA3 S=256: 40.7%</title>
+<text x="169.29" y="344" text-anchor="middle" class="tick">256</text>
+<rect x="223.57" y="142.27" width="18" height="183.73" fill="#2563eb" opacity="0.82"/>
+<text x="232.57" y="138.27" text-anchor="middle" class="annot">46.5</text>
+<title>FA-T S=512: 46.5%</title>
+<rect x="245.57" y="145.19" width="18" height="180.81" fill="#dc2626" opacity="0.82"/>
+<text x="254.57" y="141.19" text-anchor="middle" class="annot">45.7</text>
+<title>FA3 S=512: 45.7%</title>
+<text x="243.57" y="344" text-anchor="middle" class="tick">512</text>
+<rect x="297.86" y="120.08" width="18" height="205.92" fill="#2563eb" opacity="0.82"/>
+<text x="306.86" y="116.08" text-anchor="middle" class="annot">52.1</text>
+<title>FA-T S=1024: 52.1%</title>
+<rect x="319.86" y="116.45" width="18" height="209.55" fill="#dc2626" opacity="0.82"/>
+<text x="328.86" y="112.45" text-anchor="middle" class="annot">53.0</text>
+<title>FA3 S=1024: 53.0%</title>
+<text x="317.86" y="344" text-anchor="middle" class="tick">1k</text>
+<rect x="372.14" y="107.35" width="18" height="218.65" fill="#2563eb" opacity="0.82"/>
+<text x="381.14" y="103.35" text-anchor="middle" class="annot">55.3</text>
+<title>FA-T S=2048: 55.3%</title>
+<rect x="394.14" y="99.45" width="18" height="226.55" fill="#dc2626" opacity="0.82"/>
+<text x="403.14" y="95.45" text-anchor="middle" class="annot">57.3</text>
+<title>FA3 S=2048: 57.3%</title>
+<text x="392.14" y="344" text-anchor="middle" class="tick">2k</text>
+<rect x="446.43" y="100.04" width="18" height="225.96" fill="#2563eb" opacity="0.82"/>
+<text x="455.43" y="96.04" text-anchor="middle" class="annot">57.1</text>
+<title>FA-T S=4096: 57.1%</title>
+<rect x="468.43" y="87.98" width="18" height="238.02" fill="#dc2626" opacity="0.82"/>
+<text x="477.43" y="83.98" text-anchor="middle" class="annot">60.2</text>
+<title>FA3 S=4096: 60.2%</title>
+<text x="466.43" y="344" text-anchor="middle" class="tick">4k</text>
+<rect x="520.71" y="97.94" width="18" height="228.06" fill="#2563eb" opacity="0.82"/>
+<text x="529.71" y="93.94" text-anchor="middle" class="annot">57.7</text>
+<title>FA-T S=8192: 57.7%</title>
+<rect x="542.71" y="81.42" width="18" height="244.58" fill="#dc2626" opacity="0.82"/>
+<text x="551.71" y="77.42" text-anchor="middle" class="annot">61.9</text>
+<title>FA3 S=8192: 61.9%</title>
+<text x="540.71" y="344" text-anchor="middle" class="tick">8k</text>
+<rect x="595.00" y="97.15" width="18" height="228.85" fill="#2563eb" opacity="0.82"/>
+<text x="604.00" y="93.15" text-anchor="middle" class="annot">57.9</text>
+<title>FA-T S=16384: 57.9%</title>
+<rect x="617.00" y="79.04" width="18" height="246.96" fill="#dc2626" opacity="0.82"/>
+<text x="626.00" y="75.04" text-anchor="middle" class="annot">62.5</text>
+<title>FA3 S=16384: 62.5%</title>
+<text x="615.00" y="344" text-anchor="middle" class="tick">16k</text>
+<rect x="80" y="47" width="14" height="14" fill="#2563eb" opacity="0.82"/>
+<text x="100" y="59" class="legend">FA-T</text>
+<rect x="162" y="47" width="14" height="14" fill="#dc2626" opacity="0.82"/>
+<text x="182" y="59" class="legend">FA3</text>
+<text x="355.0" y="372" text-anchor="middle" class="label">Sequence Length</text>
+<text x="16" y="184.0" transform="rotate(-90 16 184.0)" text-anchor="middle" class="label">Tensor Core Utilization (%)</text>
+</svg></div><div class="card"><svg viewBox="0 0 660 390" role="img" aria-label="non-causal, H=16, D=128">
+<text x="330.0" y="22" text-anchor="middle" class="title">non-causal, H=16, D=128</text>
+<line x1="68" y1="326" x2="642" y2="326" class="axis"/>
+<line x1="68" y1="42" x2="68" y2="326" class="axis"/>
+<line x1="68" y1="326.00" x2="642" y2="326.00" class="grid"/>
+<text x="60" y="330.00" text-anchor="end" class="tick">0</text>
+<line x1="68" y1="269.20" x2="642" y2="269.20" class="grid"/>
+<text x="60" y="273.20" text-anchor="end" class="tick">17</text>
+<line x1="68" y1="212.40" x2="642" y2="212.40" class="grid"/>
+<text x="60" y="216.40" text-anchor="end" class="tick">35</text>
+<line x1="68" y1="155.60" x2="642" y2="155.60" class="grid"/>
+<text x="60" y="159.60" text-anchor="end" class="tick">52</text>
+<line x1="68" y1="98.80" x2="642" y2="98.80" class="grid"/>
+<text x="60" y="102.80" text-anchor="end" class="tick">69</text>
+<line x1="68" y1="42.00" x2="642" y2="42.00" class="grid"/>
+<text x="60" y="46.00" text-anchor="end" class="tick">87</text>
+<rect x="75.00" y="246.61" width="18" height="79.39" fill="#2563eb" opacity="0.82"/>
+<text x="84.00" y="242.61" text-anchor="middle" class="annot">24.3</text>
+<title>FA-T S=128: 24.3%</title>
+<rect x="97.00" y="227.22" width="18" height="98.78" fill="#dc2626" opacity="0.82"/>
+<text x="106.00" y="223.22" text-anchor="middle" class="annot">30.2</text>
+<title>FA3 S=128: 30.2%</title>
+<text x="95.00" y="344" text-anchor="middle" class="tick">128</text>
+<rect x="149.29" y="185.58" width="18" height="140.42" fill="#2563eb" opacity="0.82"/>
+<text x="158.29" y="181.58" text-anchor="middle" class="annot">42.9</text>
+<title>FA-T S=256: 42.9%</title>
+<rect x="171.29" y="194.25" width="18" height="131.75" fill="#dc2626" opacity="0.82"/>
+<text x="180.29" y="190.25" text-anchor="middle" class="annot">40.3</text>
+<title>FA3 S=256: 40.3%</title>
+<text x="169.29" y="344" text-anchor="middle" class="tick">256</text>
+<rect x="223.57" y="140.41" width="18" height="185.59" fill="#2563eb" opacity="0.82"/>
+<text x="232.57" y="136.41" text-anchor="middle" class="annot">56.7</text>
+<title>FA-T S=512: 56.7%</title>
+<rect x="245.57" y="179.53" width="18" height="146.47" fill="#dc2626" opacity="0.82"/>
+<text x="254.57" y="175.53" text-anchor="middle" class="annot">44.8</text>
+<title>FA3 S=512: 44.8%</title>
+<text x="243.57" y="344" text-anchor="middle" class="tick">512</text>
+<rect x="297.86" y="111.49" width="18" height="214.51" fill="#2563eb" opacity="0.82"/>
+<text x="306.86" y="107.49" text-anchor="middle" class="annot">65.6</text>
+<title>FA-T S=1024: 65.6%</title>
+<rect x="319.86" y="164.55" width="18" height="161.45" fill="#dc2626" opacity="0.82"/>
+<text x="328.86" y="160.55" text-anchor="middle" class="annot">49.4</text>
+<title>FA3 S=1024: 49.4%</title>
+<text x="317.86" y="344" text-anchor="middle" class="tick">1k</text>
+<rect x="372.14" y="93.40" width="18" height="232.60" fill="#2563eb" opacity="0.82"/>
+<text x="381.14" y="89.40" text-anchor="middle" class="annot">71.1</text>
+<title>FA-T S=2048: 71.1%</title>
+<rect x="394.14" y="156.24" width="18" height="169.76" fill="#dc2626" opacity="0.82"/>
+<text x="403.14" y="152.24" text-anchor="middle" class="annot">51.9</text>
+<title>FA3 S=2048: 51.9%</title>
+<text x="392.14" y="344" text-anchor="middle" class="tick">2k</text>
+<rect x="446.43" y="83.43" width="18" height="242.57" fill="#2563eb" opacity="0.82"/>
+<text x="455.43" y="79.43" text-anchor="middle" class="annot">74.2</text>
+<title>FA-T S=4096: 74.2%</title>
+<rect x="468.43" y="151.66" width="18" height="174.34" fill="#dc2626" opacity="0.82"/>
+<text x="477.43" y="147.66" text-anchor="middle" class="annot">53.3</text>
+<title>FA3 S=4096: 53.3%</title>
+<text x="466.43" y="344" text-anchor="middle" class="tick">4k</text>
+<rect x="520.71" y="80.94" width="18" height="245.06" fill="#2563eb" opacity="0.82"/>
+<text x="529.71" y="76.94" text-anchor="middle" class="annot">74.9</text>
+<title>FA-T S=8192: 74.9%</title>
+<rect x="542.71" y="149.27" width="18" height="176.73" fill="#dc2626" opacity="0.82"/>
+<text x="551.71" y="145.27" text-anchor="middle" class="annot">54.0</text>
+<title>FA3 S=8192: 54.0%</title>
+<text x="540.71" y="344" text-anchor="middle" class="tick">8k</text>
+<rect x="595.00" y="79.04" width="18" height="246.96" fill="#2563eb" opacity="0.82"/>
+<text x="604.00" y="75.04" text-anchor="middle" class="annot">75.5</text>
+<title>FA-T S=16384: 75.5%</title>
+<rect x="617.00" y="148.68" width="18" height="177.32" fill="#dc2626" opacity="0.82"/>
+<text x="626.00" y="144.68" text-anchor="middle" class="annot">54.2</text>
+<title>FA3 S=16384: 54.2%</title>
+<text x="615.00" y="344" text-anchor="middle" class="tick">16k</text>
+<rect x="80" y="47" width="14" height="14" fill="#2563eb" opacity="0.82"/>
+<text x="100" y="59" class="legend">FA-T</text>
+<rect x="162" y="47" width="14" height="14" fill="#dc2626" opacity="0.82"/>
+<text x="182" y="59" class="legend">FA3</text>
+<text x="355.0" y="372" text-anchor="middle" class="label">Sequence Length</text>
+<text x="16" y="184.0" transform="rotate(-90 16 184.0)" text-anchor="middle" class="label">Tensor Core Utilization (%)</text>
+</svg></div><div class="card"><svg viewBox="0 0 660 390" role="img" aria-label="causal, H=32, D=64">
+<text x="330.0" y="22" text-anchor="middle" class="title">causal, H=32, D=64</text>
+<line x1="68" y1="326" x2="642" y2="326" class="axis"/>
+<line x1="68" y1="42" x2="68" y2="326" class="axis"/>
+<line x1="68" y1="326.00" x2="642" y2="326.00" class="grid"/>
+<text x="60" y="330.00" text-anchor="end" class="tick">0</text>
+<line x1="68" y1="269.20" x2="642" y2="269.20" class="grid"/>
+<text x="60" y="273.20" text-anchor="end" class="tick">14</text>
+<line x1="68" y1="212.40" x2="642" y2="212.40" class="grid"/>
+<text x="60" y="216.40" text-anchor="end" class="tick">28</text>
+<line x1="68" y1="155.60" x2="642" y2="155.60" class="grid"/>
+<text x="60" y="159.60" text-anchor="end" class="tick">42</text>
+<line x1="68" y1="98.80" x2="642" y2="98.80" class="grid"/>
+<text x="60" y="102.80" text-anchor="end" class="tick">57</text>
+<line x1="68" y1="42.00" x2="642" y2="42.00" class="grid"/>
+<text x="60" y="46.00" text-anchor="end" class="tick">71</text>
+<rect x="75.00" y="213.29" width="18" height="112.71" fill="#2563eb" opacity="0.82"/>
+<text x="84.00" y="209.29" text-anchor="middle" class="annot">28.0</text>
+<title>FA-T S=128: 28.0%</title>
+<rect x="97.00" y="214.02" width="18" height="111.98" fill="#dc2626" opacity="0.82"/>
+<text x="106.00" y="210.02" text-anchor="middle" class="annot">27.9</text>
+<title>FA3 S=128: 27.9%</title>
+<text x="95.00" y="344" text-anchor="middle" class="tick">128</text>
+<rect x="149.29" y="184.27" width="18" height="141.73" fill="#2563eb" opacity="0.82"/>
+<text x="158.29" y="180.27" text-anchor="middle" class="annot">35.3</text>
+<title>FA-T S=256: 35.3%</title>
+<rect x="171.29" y="179.37" width="18" height="146.63" fill="#dc2626" opacity="0.82"/>
+<text x="180.29" y="175.37" text-anchor="middle" class="annot">36.5</text>
+<title>FA3 S=256: 36.5%</title>
+<text x="169.29" y="344" text-anchor="middle" class="tick">256</text>
+<rect x="223.57" y="159.88" width="18" height="166.12" fill="#2563eb" opacity="0.82"/>
+<text x="232.57" y="155.88" text-anchor="middle" class="annot">41.3</text>
+<title>FA-T S=512: 41.3%</title>
+<rect x="245.57" y="159.51" width="18" height="166.49" fill="#dc2626" opacity="0.82"/>
+<text x="254.57" y="155.51" text-anchor="middle" class="annot">41.4</text>
+<title>FA3 S=512: 41.4%</title>
+<text x="243.57" y="344" text-anchor="middle" class="tick">512</text>
+<rect x="297.86" y="132.50" width="18" height="193.50" fill="#2563eb" opacity="0.82"/>
+<text x="306.86" y="128.50" text-anchor="middle" class="annot">48.1</text>
+<title>FA-T S=1024: 48.1%</title>
+<rect x="319.86" y="129.29" width="18" height="196.71" fill="#dc2626" opacity="0.82"/>
+<text x="328.86" y="125.29" text-anchor="middle" class="annot">48.9</text>
+<title>FA3 S=1024: 48.9%</title>
+<text x="317.86" y="344" text-anchor="middle" class="tick">1k</text>
+<rect x="372.14" y="116.46" width="18" height="209.54" fill="#2563eb" opacity="0.82"/>
+<text x="381.14" y="112.46" text-anchor="middle" class="annot">52.1</text>
+<title>FA-T S=2048: 52.1%</title>
+<rect x="394.14" y="109.71" width="18" height="216.29" fill="#dc2626" opacity="0.82"/>
+<text x="403.14" y="105.71" text-anchor="middle" class="annot">53.8</text>
+<title>FA3 S=2048: 53.8%</title>
+<text x="392.14" y="344" text-anchor="middle" class="tick">2k</text>
+<rect x="446.43" y="104.45" width="18" height="221.55" fill="#2563eb" opacity="0.82"/>
+<text x="455.43" y="100.45" text-anchor="middle" class="annot">55.1</text>
+<title>FA-T S=4096: 55.1%</title>
+<rect x="468.43" y="93.92" width="18" height="232.08" fill="#dc2626" opacity="0.82"/>
+<text x="477.43" y="89.92" text-anchor="middle" class="annot">57.7</text>
+<title>FA3 S=4096: 57.7%</title>
+<text x="466.43" y="344" text-anchor="middle" class="tick">4k</text>
+<rect x="520.71" y="97.49" width="18" height="228.51" fill="#2563eb" opacity="0.82"/>
+<text x="529.71" y="93.49" text-anchor="middle" class="annot">56.9</text>
+<title>FA-T S=8192: 56.9%</title>
+<rect x="542.71" y="84.55" width="18" height="241.45" fill="#dc2626" opacity="0.82"/>
+<text x="551.71" y="80.55" text-anchor="middle" class="annot">60.1</text>
+<title>FA3 S=8192: 60.1%</title>
+<text x="540.71" y="344" text-anchor="middle" class="tick">8k</text>
+<rect x="595.00" y="93.35" width="18" height="232.65" fill="#2563eb" opacity="0.82"/>
+<text x="604.00" y="89.35" text-anchor="middle" class="annot">57.9</text>
+<title>FA-T S=16384: 57.9%</title>
+<rect x="617.00" y="79.04" width="18" height="246.96" fill="#dc2626" opacity="0.82"/>
+<text x="626.00" y="75.04" text-anchor="middle" class="annot">61.4</text>
+<title>FA3 S=16384: 61.4%</title>
+<text x="615.00" y="344" text-anchor="middle" class="tick">16k</text>
+<rect x="80" y="47" width="14" height="14" fill="#2563eb" opacity="0.82"/>
+<text x="100" y="59" class="legend">FA-T</text>
+<rect x="162" y="47" width="14" height="14" fill="#dc2626" opacity="0.82"/>
+<text x="182" y="59" class="legend">FA3</text>
+<text x="355.0" y="372" text-anchor="middle" class="label">Sequence Length</text>
+<text x="16" y="184.0" transform="rotate(-90 16 184.0)" text-anchor="middle" class="label">Tensor Core Utilization (%)</text>
+</svg></div><div class="card"><svg viewBox="0 0 660 390" role="img" aria-label="causal, H=16, D=128">
+<text x="330.0" y="22" text-anchor="middle" class="title">causal, H=16, D=128</text>
+<line x1="68" y1="326" x2="642" y2="326" class="axis"/>
+<line x1="68" y1="42" x2="68" y2="326" class="axis"/>
+<line x1="68" y1="326.00" x2="642" y2="326.00" class="grid"/>
+<text x="60" y="330.00" text-anchor="end" class="tick">0</text>
+<line x1="68" y1="269.20" x2="642" y2="269.20" class="grid"/>
+<text x="60" y="273.20" text-anchor="end" class="tick">20</text>
+<line x1="68" y1="212.40" x2="642" y2="212.40" class="grid"/>
+<text x="60" y="216.40" text-anchor="end" class="tick">40</text>
+<line x1="68" y1="155.60" x2="642" y2="155.60" class="grid"/>
+<text x="60" y="159.60" text-anchor="end" class="tick">60</text>
+<line x1="68" y1="98.80" x2="642" y2="98.80" class="grid"/>
+<text x="60" y="102.80" text-anchor="end" class="tick">80</text>
+<line x1="68" y1="42.00" x2="642" y2="42.00" class="grid"/>
+<text x="60" y="46.00" text-anchor="end" class="tick">100</text>
+<rect x="75.00" y="227.68" width="18" height="98.32" fill="#2563eb" opacity="0.82"/>
+<text x="84.00" y="223.68" text-anchor="middle" class="annot">34.6</text>
+<title>FA-T S=128: 34.6%</title>
+<rect x="97.00" y="258.44" width="18" height="67.56" fill="#dc2626" opacity="0.82"/>
+<text x="106.00" y="254.44" text-anchor="middle" class="annot">23.8</text>
+<title>FA3 S=128: 23.8%</title>
+<text x="95.00" y="344" text-anchor="middle" class="tick">128</text>
+<rect x="149.29" y="216.92" width="18" height="109.08" fill="#2563eb" opacity="0.82"/>
+<text x="158.29" y="212.92" text-anchor="middle" class="annot">38.4</text>
+<title>FA-T S=256: 38.4%</title>
+<rect x="171.29" y="231.91" width="18" height="94.09" fill="#dc2626" opacity="0.82"/>
+<text x="180.29" y="227.91" text-anchor="middle" class="annot">33.1</text>
+<title>FA3 S=256: 33.1%</title>
+<text x="169.29" y="344" text-anchor="middle" class="tick">256</text>
+<rect x="223.57" y="190.25" width="18" height="135.75" fill="#2563eb" opacity="0.82"/>
+<text x="232.57" y="186.25" text-anchor="middle" class="annot">47.8</text>
+<title>FA-T S=512: 47.8%</title>
+<rect x="245.57" y="189.99" width="18" height="136.01" fill="#dc2626" opacity="0.82"/>
+<text x="254.57" y="185.99" text-anchor="middle" class="annot">47.9</text>
+<title>FA3 S=512: 47.9%</title>
+<text x="243.57" y="344" text-anchor="middle" class="tick">512</text>
+<rect x="297.86" y="161.37" width="18" height="164.63" fill="#2563eb" opacity="0.82"/>
+<text x="306.86" y="157.37" text-anchor="middle" class="annot">58.0</text>
+<title>FA-T S=1024: 58.0%</title>
+<rect x="319.86" y="143.42" width="18" height="182.58" fill="#dc2626" opacity="0.82"/>
+<text x="328.86" y="139.42" text-anchor="middle" class="annot">64.3</text>
+<title>FA3 S=1024: 64.3%</title>
+<text x="317.86" y="344" text-anchor="middle" class="tick">1k</text>
+<rect x="372.14" y="140.95" width="18" height="185.05" fill="#2563eb" opacity="0.82"/>
+<text x="381.14" y="136.95" text-anchor="middle" class="annot">65.2</text>
+<title>FA-T S=2048: 65.2%</title>
+<rect x="394.14" y="114.87" width="18" height="211.13" fill="#dc2626" opacity="0.82"/>
+<text x="403.14" y="110.87" text-anchor="middle" class="annot">74.3</text>
+<title>FA3 S=2048: 74.3%</title>
+<text x="392.14" y="344" text-anchor="middle" class="tick">2k</text>
+<rect x="446.43" y="126.52" width="18" height="199.48" fill="#2563eb" opacity="0.82"/>
+<text x="455.43" y="122.52" text-anchor="middle" class="annot">70.2</text>
+<title>FA-T S=4096: 70.2%</title>
+<rect x="468.43" y="95.22" width="18" height="230.78" fill="#dc2626" opacity="0.82"/>
+<text x="477.43" y="91.22" text-anchor="middle" class="annot">81.3</text>
+<title>FA3 S=4096: 81.3%</title>
+<text x="466.43" y="344" text-anchor="middle" class="tick">4k</text>
+<rect x="520.71" y="117.97" width="18" height="208.03" fill="#2563eb" opacity="0.82"/>
+<text x="529.71" y="113.97" text-anchor="middle" class="annot">73.2</text>
+<title>FA-T S=8192: 73.2%</title>
+<rect x="542.71" y="84.17" width="18" height="241.83" fill="#dc2626" opacity="0.82"/>
+<text x="551.71" y="80.17" text-anchor="middle" class="annot">85.2</text>
+<title>FA3 S=8192: 85.2%</title>
+<text x="540.71" y="344" text-anchor="middle" class="tick">8k</text>
+<rect x="595.00" y="113.28" width="18" height="212.72" fill="#2563eb" opacity="0.82"/>
+<text x="604.00" y="109.28" text-anchor="middle" class="annot">74.9</text>
+<title>FA-T S=16384: 74.9%</title>
+<rect x="617.00" y="78.64" width="18" height="247.36" fill="#dc2626" opacity="0.82"/>
+<text x="626.00" y="74.64" text-anchor="middle" class="annot">87.1</text>
+<title>FA3 S=16384: 87.1%</title>
+<text x="615.00" y="344" text-anchor="middle" class="tick">16k</text>
+<rect x="80" y="47" width="14" height="14" fill="#2563eb" opacity="0.82"/>
+<text x="100" y="59" class="legend">FA-T</text>
+<rect x="162" y="47" width="14" height="14" fill="#dc2626" opacity="0.82"/>
+<text x="182" y="59" class="legend">FA3</text>
+<text x="355.0" y="372" text-anchor="middle" class="label">Sequence Length</text>
+<text x="16" y="184.0" transform="rotate(-90 16 184.0)" text-anchor="middle" class="label">Tensor Core Utilization (%)</text>
+</svg></div>
+  </div>
+</body>
+</html>
