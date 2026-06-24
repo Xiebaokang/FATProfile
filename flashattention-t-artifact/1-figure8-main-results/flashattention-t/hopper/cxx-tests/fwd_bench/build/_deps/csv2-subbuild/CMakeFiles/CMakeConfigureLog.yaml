@@ -23,7 +23,7 @@ events:
       - "/usr/local/cuda/bin/"
       - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand/"
       - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli/"
-      - "/home/xiebaokang/.vscode-server/cli/servers/Stable-1b50d58d73426c9171299ec4037d01365d995b78/server/bin/remote-cli/"
+      - "/home/xiebaokang/.vscode-server/cli/servers/Stable-6928394f91b684055b873eecb8bc281365131f1c/server/bin/remote-cli/"
       - "/home/xiebaokang/miniconda3/envs/torch/bin/"
       - "/home/xiebaokang/miniconda3/condabin/"
       - "/usr/local/sbin/"
@@ -39,7 +39,7 @@ events:
       - "/usr/local/cuda/bin/uname"
       - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand/uname"
       - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli/uname"
-      - "/home/xiebaokang/.vscode-server/cli/servers/Stable-1b50d58d73426c9171299ec4037d01365d995b78/server/bin/remote-cli/uname"
+      - "/home/xiebaokang/.vscode-server/cli/servers/Stable-6928394f91b684055b873eecb8bc281365131f1c/server/bin/remote-cli/uname"
       - "/home/xiebaokang/miniconda3/envs/torch/bin/uname"
       - "/home/xiebaokang/miniconda3/condabin/uname"
       - "/usr/local/sbin/uname"
@@ -51,7 +51,7 @@ events:
         - "/usr/local/cuda/bin"
         - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
         - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
-        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-1b50d58d73426c9171299ec4037d01365d995b78/server/bin/remote-cli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-6928394f91b684055b873eecb8bc281365131f1c/server/bin/remote-cli"
         - "/usr/local/cuda/bin"
         - "/home/xiebaokang/miniconda3/envs/torch/bin"
         - "/home/xiebaokang/miniconda3/condabin"
@@ -70,5 +70,5 @@ events:
       - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data/share/cmake-4.2/Modules/CMakeDetermineSystem.cmake:212 (message)"
       - "CMakeLists.txt:16 (project)"
     message: |
-      The system is: Linux - 5.15.0-179-generic - x86_64
+      The system is: Linux - 5.15.0-181-generic - x86_64
 ...

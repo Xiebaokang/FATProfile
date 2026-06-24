@@ -123,7 +123,7 @@ def make_bench_cmd(args, csv_path, B, H, S, D):
         str(D),
         "--causal",
         str(args.causal),
-        " ",
+        "--warmup",
         str(args.warmup),
         "--iter",
         str(args.iter),
@@ -240,19 +240,19 @@ def build_parser():
         description="Sweep FA-T or FA3 single-shape benchmark and save tensor-core utilization CSV."
     )
     parser.add_argument("--method", choices=["fat", "fa3"], default="fa3")
-    parser.add_argument("--dtype", choices=["fp16", "fp8"], default="fp8")
+    parser.add_argument("--dtype", choices=["fp16", "fp8"], default="fp16")
     # parser.add_argument("--batch-sizes", type=parse_int_list, default=[1, 2, 4, 8, 16, 32, 64, 128])
     # parser.add_argument("--num-heads", type=parse_int_list, default=[16, 32])
     # parser.add_argument("--seq-lens", type=parse_int_list, default=[128, 256, 512, 1024, 2048, 4096, 8192, 16384])
     # parser.add_argument("--head-dims", type=parse_int_list, default=[64, 128])
-    # parser.add_argument("--batch-sizes", type=parse_int_list, default=[128])
-    # parser.add_argument("--num-heads", type=parse_int_list, default=[32])
-    # parser.add_argument("--seq-lens", type=parse_int_list, default=[128])
-    # parser.add_argument("--head-dims", type=parse_int_list, default=[64])
-    parser.add_argument("--batch-sizes", type=parse_int_list, default=[1, 2, 4, 8, 16, 32, 64, 128])
-    parser.add_argument("--num-heads", type=parse_int_list, default=[8, 12, 16, 32])
-    parser.add_argument("--seq-lens", type=parse_int_list, default=[128, 256, 512, 1024, 2048, 4096, 8192, 16384])
-    parser.add_argument("--head-dims", type=parse_int_list, default=[64, 128])
+    parser.add_argument("--batch-sizes", type=parse_int_list, default=[1])
+    parser.add_argument("--num-heads", type=parse_int_list, default=[16])
+    parser.add_argument("--seq-lens", type=parse_int_list, default=[8192])
+    parser.add_argument("--head-dims", type=parse_int_list, default=[128])
+    # parser.add_argument("--batch-sizes", type=parse_int_list, default=[1, 2, 4, 8, 16, 32, 64, 128])
+    # parser.add_argument("--num-heads", type=parse_int_list, default=[8, 12, 16, 32])
+    # parser.add_argument("--seq-lens", type=parse_int_list, default=[128, 256, 512, 1024, 2048, 4096, 8192, 16384])
+    # parser.add_argument("--head-dims", type=parse_int_list, default=[64, 128])
     parser.add_argument("--causal", type=int, choices=[0, 1], default=0)
     parser.add_argument("--build", type=Path, default=None)
     parser.add_argument("--bin", type=Path, default=None)

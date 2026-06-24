@@ -175,6 +175,10 @@ void bench_fwd_single_to_csv(int argc, char* argv[]) {
   float avg_time_ms = bench_fwd_single_dispatch(
     batch_size, num_heads, seqlen, head_dim, is_causal, iter, warmup
   );
+
+  printf("batch_size: %-10d, seqlen: %-10d, num_heads: %-10d, head_dim: %-10d, causal: %-10d, avg_time_ms: %.6f\n",
+    batch_size, seqlen, num_heads, head_dim, is_causal, avg_time_ms);
+
   if (!csv_filename.empty()) {
     std::vector<std::string> csv_header = {
       "DataType",
@@ -196,9 +200,6 @@ void bench_fwd_single_to_csv(int argc, char* argv[]) {
       std::to_string(is_causal),
       std::to_string(avg_time_ms)
     }};
-
-    printf("batch_size: %-10d, seqlen: %-10d, num_heads: %-10d, head_dim: %-10d, causal: %-10d, avg_time_ms: %.6f\n",
-      batch_size, seqlen, num_heads, head_dim, is_causal, avg_time_ms);
 
     add_write_result_to_csv(csv_filename, csv_header, csv_data);
   }

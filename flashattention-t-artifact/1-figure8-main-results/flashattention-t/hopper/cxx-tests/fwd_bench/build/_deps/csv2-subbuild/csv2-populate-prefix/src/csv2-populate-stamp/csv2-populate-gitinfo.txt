@@ -3,9 +3,9 @@
 # No other meaning or use of this file is supported.
 
 method=git
-command=/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data/bin/cmake;-DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE;-P;/home/xiebaokang/projects/cuda/test/microbenchmarks/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/_deps/csv2-subbuild/csv2-populate-prefix/tmp/csv2-populate-gitclone.cmake
-source_dir=/home/xiebaokang/projects/cuda/test/microbenchmarks/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/_deps/csv2-src
-work_dir=/home/xiebaokang/projects/cuda/test/microbenchmarks/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/_deps
+command=/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data/bin/cmake;-DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE;-P;/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/_deps/csv2-subbuild/csv2-populate-prefix/tmp/csv2-populate-gitclone.cmake
+source_dir=/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/_deps/csv2-src
+work_dir=/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/_deps
 repository=https://github.com/p-ranav/csv2.git
 remote=origin
 init_submodules=TRUE

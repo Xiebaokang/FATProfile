@@ -23,7 +23,7 @@ rule CUSTOM_COMMAND
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data/bin/cmake --regenerate-during-build -S/home/xiebaokang/projects/cuda/test/microbenchmarks/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/_deps/csv2-subbuild -B/home/xiebaokang/projects/cuda/test/microbenchmarks/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/_deps/csv2-subbuild
+  command = /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data/bin/cmake --regenerate-during-build -S/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/_deps/csv2-subbuild -B/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/_deps/csv2-subbuild
   description = Re-running CMake...
   generator = 1
 
