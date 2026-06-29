@@ -239,7 +239,7 @@ def build_parser():
     parser = argparse.ArgumentParser(
         description="Sweep FA-T or FA3 single-shape benchmark and save tensor-core utilization CSV."
     )
-    parser.add_argument("--method", choices=["fat", "fa3"], default="fa3")
+    parser.add_argument("--method", choices=["fat", "fa3"], default="fat")
     parser.add_argument("--dtype", choices=["fp16", "fp8"], default="fp16")
     # parser.add_argument("--batch-sizes", type=parse_int_list, default=[1, 2, 4, 8, 16, 32, 64, 128])
     # parser.add_argument("--num-heads", type=parse_int_list, default=[16, 32])

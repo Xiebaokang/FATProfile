@@ -162,6 +162,7 @@ float bench_fwd_single_dispatch(
   throw std::runtime_error("single-shape mode supports head_dim 64 or 128");
 }
 
+// ./fp16-fwd-bench-orig --single --batch-size 1 --num-heads 16 --seq-len 58368 --head-dim 64 --causal 0 --iter 500 --warmup 100
 void bench_fwd_single_to_csv(int argc, char* argv[]) {
   std::string csv_filename = get_string_arg(argc, argv, "--csv", "");
   int batch_size = get_int_arg(argc, argv, "--batch-size", 1);
