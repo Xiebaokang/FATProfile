@@ -83,160 +83,43 @@ build libfa3_prepare_scheduler.so: CUDA_SHARED_LIBRARY_LINKER__fa3_prepare_sched
   TARGET_SUPPORT_DIR = CMakeFiles/fa3_prepare_scheduler.dir
 
 # =============================================================================
-# Object build statements for EXECUTABLE target fp8-fwd-bench
+# Object build statements for EXECUTABLE target attn_test
 
 
 #############################################
-# Order-only phony target for fp8-fwd-bench
+# Order-only phony target for attn_test
 
-build cmake_object_order_depends_target_fp8-fwd-bench: phony || cmake_object_order_depends_target_fa3_prepare_scheduler
+build cmake_object_order_depends_target_attn_test: phony || cmake_object_order_depends_target_fa3_prepare_scheduler
 
-build CMakeFiles/fp8-fwd-bench.dir/fp8-fwd-bench.cu.o: CUDA_COMPILER__fp8-fwd-bench_unscanned_Release /home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/fp8-fwd-bench.cu || cmake_object_order_depends_target_fp8-fwd-bench
+build CMakeFiles/attn_test.dir/attn_test.cu.o: CUDA_COMPILER__attn_test_unscanned_Release /home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/attn_test.cu || cmake_object_order_depends_target_attn_test
   CONFIG = Release
   DEFINES = -DUSE_C10D_GLOO -DUSE_C10D_NCCL -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE
-  DEP_FILE = CMakeFiles/fp8-fwd-bench.dir/fp8-fwd-bench.cu.o.d
+  DEP_FILE = CMakeFiles/attn_test.dir/attn_test.cu.o.d
   FLAGS = -DONNX_NAMESPACE=onnx_c2 -gencode arch=compute_90a,code=sm_90a -Xcudafe --diag_suppress=cc_clobber_ignored,--diag_suppress=field_without_dll_interface,--diag_suppress=base_class_has_different_dll_interface,--diag_suppress=dll_interface_conflict_none_assumed,--diag_suppress=dll_interface_conflict_dllexport_assumed,--diag_suppress=bad_friend_decl --expt-relaxed-constexpr --expt-extended-lambda -O3 -DNDEBUG -std=c++20 --expt-relaxed-constexpr --expt-extended-lambda --use_fast_math -Xptxas --register-usage-level=10 -D_GLIBCXX_USE_CXX11_ABI=0
   INCLUDES = -I/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cutlass/include -I/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper -I/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/custom_api -I/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/_deps/csv2-src/include -I/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/_deps/argparse-src/include -isystem /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/include -isystem /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/include/torch/csrc/api/include -isystem /usr/local/cuda/include
-  OBJECT_DIR = CMakeFiles/fp8-fwd-bench.dir
-  OBJECT_FILE_DIR = CMakeFiles/fp8-fwd-bench.dir
-  TARGET_SUPPORT_DIR = CMakeFiles/fp8-fwd-bench.dir
+  OBJECT_DIR = CMakeFiles/attn_test.dir
+  OBJECT_FILE_DIR = CMakeFiles/attn_test.dir
+  TARGET_SUPPORT_DIR = CMakeFiles/attn_test.dir
 
 
 # =============================================================================
-# Link build statements for EXECUTABLE target fp8-fwd-bench
+# Link build statements for EXECUTABLE target attn_test
 
 
 #############################################
-# Link the executable fp8-fwd-bench
+# Link the executable attn_test
 
-build fp8-fwd-bench: CUDA_EXECUTABLE_LINKER__fp8-fwd-bench_Release CMakeFiles/fp8-fwd-bench.dir/fp8-fwd-bench.cu.o | /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10.so /usr/local/cuda/lib64/libnvrtc.so /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10_cuda.so libfa3_prepare_scheduler.so /usr/local/cuda/lib64/libnvToolsExt.so /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libtorch.so /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10_cuda.so /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10.so /usr/local/cuda/lib64/libcudart.so || libfa3_prepare_scheduler.so
+build attn_test: CUDA_EXECUTABLE_LINKER__attn_test_Release CMakeFiles/attn_test.dir/attn_test.cu.o | /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10.so /usr/local/cuda/lib64/libnvrtc.so /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10_cuda.so libfa3_prepare_scheduler.so /usr/local/cuda/lib64/libnvToolsExt.so /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libtorch.so /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10_cuda.so /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10.so /usr/local/cuda/lib64/libcudart.so || libfa3_prepare_scheduler.so
   CONFIG = Release
   FLAGS = -DONNX_NAMESPACE=onnx_c2 -gencode arch=compute_90a,code=sm_90a -Xcudafe --diag_suppress=cc_clobber_ignored,--diag_suppress=field_without_dll_interface,--diag_suppress=base_class_has_different_dll_interface,--diag_suppress=dll_interface_conflict_none_assumed,--diag_suppress=dll_interface_conflict_dllexport_assumed,--diag_suppress=bad_friend_decl --expt-relaxed-constexpr --expt-extended-lambda -O3 -DNDEBUG
   LINK_LIBRARIES = -Wl,-rpath,/lib/intel64:/lib/intel64_win:/lib/win-x64:/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib:/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build  /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10.so  /usr/local/cuda/lib64/libnvrtc.so  /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10_cuda.so  libfa3_prepare_scheduler.so  -Wl,--no-as-needed,"/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libtorch.so" -Wl,--as-needed  /usr/local/cuda/lib64/libnvToolsExt.so  /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libtorch.so  -Wl,--no-as-needed,"/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libtorch_cpu.so" -Wl,--as-needed  -Wl,--no-as-needed,"/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libtorch_cuda.so" -Wl,--as-needed  /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10_cuda.so  /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10.so  /usr/local/cuda/lib64/libcudart.so  -lcudadevrt  -lcudart_static  -lrt  -lpthread  -ldl
   LINK_PATH = -L/lib/intel64   -L/lib/intel64_win   -L/lib/win-x64
-  OBJECT_DIR = CMakeFiles/fp8-fwd-bench.dir
+  OBJECT_DIR = CMakeFiles/attn_test.dir
   POST_BUILD = :
   PRE_LINK = :
-  TARGET_FILE = fp8-fwd-bench
-  TARGET_PDB = fp8-fwd-bench.dbg
-  TARGET_SUPPORT_DIR = CMakeFiles/fp8-fwd-bench.dir
-
-# =============================================================================
-# Object build statements for EXECUTABLE target fp16-fwd-bench
-
-
-#############################################
-# Order-only phony target for fp16-fwd-bench
-
-build cmake_object_order_depends_target_fp16-fwd-bench: phony || cmake_object_order_depends_target_fa3_prepare_scheduler
-
-build CMakeFiles/fp16-fwd-bench.dir/fp16-fwd-bench.cu.o: CUDA_COMPILER__fp16-fwd-bench_unscanned_Release /home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/fp16-fwd-bench.cu || cmake_object_order_depends_target_fp16-fwd-bench
-  CONFIG = Release
-  DEFINES = -DUSE_C10D_GLOO -DUSE_C10D_NCCL -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE
-  DEP_FILE = CMakeFiles/fp16-fwd-bench.dir/fp16-fwd-bench.cu.o.d
-  FLAGS = -DONNX_NAMESPACE=onnx_c2 -gencode arch=compute_90a,code=sm_90a -Xcudafe --diag_suppress=cc_clobber_ignored,--diag_suppress=field_without_dll_interface,--diag_suppress=base_class_has_different_dll_interface,--diag_suppress=dll_interface_conflict_none_assumed,--diag_suppress=dll_interface_conflict_dllexport_assumed,--diag_suppress=bad_friend_decl --expt-relaxed-constexpr --expt-extended-lambda -O3 -DNDEBUG -std=c++20 --expt-relaxed-constexpr --expt-extended-lambda --use_fast_math -Xptxas --register-usage-level=10 -D_GLIBCXX_USE_CXX11_ABI=0
-  INCLUDES = -I/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cutlass/include -I/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper -I/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/custom_api -I/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/_deps/csv2-src/include -I/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/_deps/argparse-src/include -isystem /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/include -isystem /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/include/torch/csrc/api/include -isystem /usr/local/cuda/include
-  OBJECT_DIR = CMakeFiles/fp16-fwd-bench.dir
-  OBJECT_FILE_DIR = CMakeFiles/fp16-fwd-bench.dir
-  TARGET_SUPPORT_DIR = CMakeFiles/fp16-fwd-bench.dir
-
-
-# =============================================================================
-# Link build statements for EXECUTABLE target fp16-fwd-bench
-
-
-#############################################
-# Link the executable fp16-fwd-bench
-
-build fp16-fwd-bench: CUDA_EXECUTABLE_LINKER__fp16-fwd-bench_Release CMakeFiles/fp16-fwd-bench.dir/fp16-fwd-bench.cu.o | /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10.so /usr/local/cuda/lib64/libnvrtc.so /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10_cuda.so libfa3_prepare_scheduler.so /usr/local/cuda/lib64/libnvToolsExt.so /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libtorch.so /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10_cuda.so /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10.so /usr/local/cuda/lib64/libcudart.so || libfa3_prepare_scheduler.so
-  CONFIG = Release
-  FLAGS = -DONNX_NAMESPACE=onnx_c2 -gencode arch=compute_90a,code=sm_90a -Xcudafe --diag_suppress=cc_clobber_ignored,--diag_suppress=field_without_dll_interface,--diag_suppress=base_class_has_different_dll_interface,--diag_suppress=dll_interface_conflict_none_assumed,--diag_suppress=dll_interface_conflict_dllexport_assumed,--diag_suppress=bad_friend_decl --expt-relaxed-constexpr --expt-extended-lambda -O3 -DNDEBUG
-  LINK_LIBRARIES = -Wl,-rpath,/lib/intel64:/lib/intel64_win:/lib/win-x64:/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib:/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build  /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10.so  /usr/local/cuda/lib64/libnvrtc.so  /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10_cuda.so  libfa3_prepare_scheduler.so  -Wl,--no-as-needed,"/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libtorch.so" -Wl,--as-needed  /usr/local/cuda/lib64/libnvToolsExt.so  /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libtorch.so  -Wl,--no-as-needed,"/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libtorch_cpu.so" -Wl,--as-needed  -Wl,--no-as-needed,"/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libtorch_cuda.so" -Wl,--as-needed  /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10_cuda.so  /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10.so  /usr/local/cuda/lib64/libcudart.so  -lcudadevrt  -lcudart_static  -lrt  -lpthread  -ldl
-  LINK_PATH = -L/lib/intel64   -L/lib/intel64_win   -L/lib/win-x64
-  OBJECT_DIR = CMakeFiles/fp16-fwd-bench.dir
-  POST_BUILD = :
-  PRE_LINK = :
-  TARGET_FILE = fp16-fwd-bench
-  TARGET_PDB = fp16-fwd-bench.dbg
-  TARGET_SUPPORT_DIR = CMakeFiles/fp16-fwd-bench.dir
-
-# =============================================================================
-# Object build statements for EXECUTABLE target fp8-fwd-bench-orig
-
-
-#############################################
-# Order-only phony target for fp8-fwd-bench-orig
-
-build cmake_object_order_depends_target_fp8-fwd-bench-orig: phony || cmake_object_order_depends_target_fa3_prepare_scheduler
-
-build CMakeFiles/fp8-fwd-bench-orig.dir/fp8-fwd-bench-orig.cu.o: CUDA_COMPILER__fp8-fwd-bench-orig_unscanned_Release /home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/fp8-fwd-bench-orig.cu || cmake_object_order_depends_target_fp8-fwd-bench-orig
-  CONFIG = Release
-  DEFINES = -DUSE_C10D_GLOO -DUSE_C10D_NCCL -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE
-  DEP_FILE = CMakeFiles/fp8-fwd-bench-orig.dir/fp8-fwd-bench-orig.cu.o.d
-  FLAGS = -DONNX_NAMESPACE=onnx_c2 -gencode arch=compute_90a,code=sm_90a -Xcudafe --diag_suppress=cc_clobber_ignored,--diag_suppress=field_without_dll_interface,--diag_suppress=base_class_has_different_dll_interface,--diag_suppress=dll_interface_conflict_none_assumed,--diag_suppress=dll_interface_conflict_dllexport_assumed,--diag_suppress=bad_friend_decl --expt-relaxed-constexpr --expt-extended-lambda -O3 -DNDEBUG -std=c++20 --expt-relaxed-constexpr --expt-extended-lambda --use_fast_math -Xptxas --register-usage-level=10 -D_GLIBCXX_USE_CXX11_ABI=0
-  INCLUDES = -I/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cutlass/include -I/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper -I/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/custom_api -I/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/_deps/csv2-src/include -I/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/_deps/argparse-src/include -isystem /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/include -isystem /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/include/torch/csrc/api/include -isystem /usr/local/cuda/include
-  OBJECT_DIR = CMakeFiles/fp8-fwd-bench-orig.dir
-  OBJECT_FILE_DIR = CMakeFiles/fp8-fwd-bench-orig.dir
-  TARGET_SUPPORT_DIR = CMakeFiles/fp8-fwd-bench-orig.dir
-
-
-# =============================================================================
-# Link build statements for EXECUTABLE target fp8-fwd-bench-orig
-
-
-#############################################
-# Link the executable fp8-fwd-bench-orig
-
-build fp8-fwd-bench-orig: CUDA_EXECUTABLE_LINKER__fp8-fwd-bench-orig_Release CMakeFiles/fp8-fwd-bench-orig.dir/fp8-fwd-bench-orig.cu.o | /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10.so /usr/local/cuda/lib64/libnvrtc.so /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10_cuda.so libfa3_prepare_scheduler.so /usr/local/cuda/lib64/libnvToolsExt.so /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libtorch.so /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10_cuda.so /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10.so /usr/local/cuda/lib64/libcudart.so || libfa3_prepare_scheduler.so
-  CONFIG = Release
-  FLAGS = -DONNX_NAMESPACE=onnx_c2 -gencode arch=compute_90a,code=sm_90a -Xcudafe --diag_suppress=cc_clobber_ignored,--diag_suppress=field_without_dll_interface,--diag_suppress=base_class_has_different_dll_interface,--diag_suppress=dll_interface_conflict_none_assumed,--diag_suppress=dll_interface_conflict_dllexport_assumed,--diag_suppress=bad_friend_decl --expt-relaxed-constexpr --expt-extended-lambda -O3 -DNDEBUG
-  LINK_LIBRARIES = -Wl,-rpath,/lib/intel64:/lib/intel64_win:/lib/win-x64:/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib:/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build  /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10.so  /usr/local/cuda/lib64/libnvrtc.so  /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10_cuda.so  libfa3_prepare_scheduler.so  -Wl,--no-as-needed,"/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libtorch.so" -Wl,--as-needed  /usr/local/cuda/lib64/libnvToolsExt.so  /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libtorch.so  -Wl,--no-as-needed,"/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libtorch_cpu.so" -Wl,--as-needed  -Wl,--no-as-needed,"/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libtorch_cuda.so" -Wl,--as-needed  /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10_cuda.so  /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10.so  /usr/local/cuda/lib64/libcudart.so  -lcudadevrt  -lcudart_static  -lrt  -lpthread  -ldl
-  LINK_PATH = -L/lib/intel64   -L/lib/intel64_win   -L/lib/win-x64
-  OBJECT_DIR = CMakeFiles/fp8-fwd-bench-orig.dir
-  POST_BUILD = :
-  PRE_LINK = :
-  TARGET_FILE = fp8-fwd-bench-orig
-  TARGET_PDB = fp8-fwd-bench-orig.dbg
-  TARGET_SUPPORT_DIR = CMakeFiles/fp8-fwd-bench-orig.dir
-
-# =============================================================================
-# Object build statements for EXECUTABLE target fp16-fwd-bench-orig
-
-
-#############################################
-# Order-only phony target for fp16-fwd-bench-orig
-
-build cmake_object_order_depends_target_fp16-fwd-bench-orig: phony || cmake_object_order_depends_target_fa3_prepare_scheduler
-
-build CMakeFiles/fp16-fwd-bench-orig.dir/fp16-fwd-bench-orig.cu.o: CUDA_COMPILER__fp16-fwd-bench-orig_unscanned_Release /home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/fp16-fwd-bench-orig.cu || cmake_object_order_depends_target_fp16-fwd-bench-orig
-  CONFIG = Release
-  DEFINES = -DUSE_C10D_GLOO -DUSE_C10D_NCCL -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE
-  DEP_FILE = CMakeFiles/fp16-fwd-bench-orig.dir/fp16-fwd-bench-orig.cu.o.d
-  FLAGS = -DONNX_NAMESPACE=onnx_c2 -gencode arch=compute_90a,code=sm_90a -Xcudafe --diag_suppress=cc_clobber_ignored,--diag_suppress=field_without_dll_interface,--diag_suppress=base_class_has_different_dll_interface,--diag_suppress=dll_interface_conflict_none_assumed,--diag_suppress=dll_interface_conflict_dllexport_assumed,--diag_suppress=bad_friend_decl --expt-relaxed-constexpr --expt-extended-lambda -O3 -DNDEBUG -std=c++20 --expt-relaxed-constexpr --expt-extended-lambda --use_fast_math -Xptxas --register-usage-level=10 -D_GLIBCXX_USE_CXX11_ABI=0
-  INCLUDES = -I/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cutlass/include -I/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper -I/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/custom_api -I/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/_deps/csv2-src/include -I/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/_deps/argparse-src/include -isystem /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/include -isystem /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/include/torch/csrc/api/include -isystem /usr/local/cuda/include
-  OBJECT_DIR = CMakeFiles/fp16-fwd-bench-orig.dir
-  OBJECT_FILE_DIR = CMakeFiles/fp16-fwd-bench-orig.dir
-  TARGET_SUPPORT_DIR = CMakeFiles/fp16-fwd-bench-orig.dir
-
-
-# =============================================================================
-# Link build statements for EXECUTABLE target fp16-fwd-bench-orig
-
-
-#############################################
-# Link the executable fp16-fwd-bench-orig
-
-build fp16-fwd-bench-orig: CUDA_EXECUTABLE_LINKER__fp16-fwd-bench-orig_Release CMakeFiles/fp16-fwd-bench-orig.dir/fp16-fwd-bench-orig.cu.o | /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10.so /usr/local/cuda/lib64/libnvrtc.so /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10_cuda.so libfa3_prepare_scheduler.so /usr/local/cuda/lib64/libnvToolsExt.so /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libtorch.so /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10_cuda.so /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10.so /usr/local/cuda/lib64/libcudart.so || libfa3_prepare_scheduler.so
-  CONFIG = Release
-  FLAGS = -DONNX_NAMESPACE=onnx_c2 -gencode arch=compute_90a,code=sm_90a -Xcudafe --diag_suppress=cc_clobber_ignored,--diag_suppress=field_without_dll_interface,--diag_suppress=base_class_has_different_dll_interface,--diag_suppress=dll_interface_conflict_none_assumed,--diag_suppress=dll_interface_conflict_dllexport_assumed,--diag_suppress=bad_friend_decl --expt-relaxed-constexpr --expt-extended-lambda -O3 -DNDEBUG
-  LINK_LIBRARIES = -Wl,-rpath,/lib/intel64:/lib/intel64_win:/lib/win-x64:/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib:/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build  /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10.so  /usr/local/cuda/lib64/libnvrtc.so  /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10_cuda.so  libfa3_prepare_scheduler.so  -Wl,--no-as-needed,"/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libtorch.so" -Wl,--as-needed  /usr/local/cuda/lib64/libnvToolsExt.so  /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libtorch.so  -Wl,--no-as-needed,"/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libtorch_cpu.so" -Wl,--as-needed  -Wl,--no-as-needed,"/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libtorch_cuda.so" -Wl,--as-needed  /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10_cuda.so  /home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/lib/libc10.so  /usr/local/cuda/lib64/libcudart.so  -lcudadevrt  -lcudart_static  -lrt  -lpthread  -ldl
-  LINK_PATH = -L/lib/intel64   -L/lib/intel64_win   -L/lib/win-x64
-  OBJECT_DIR = CMakeFiles/fp16-fwd-bench-orig.dir
-  POST_BUILD = :
-  PRE_LINK = :
-  TARGET_FILE = fp16-fwd-bench-orig
-  TARGET_PDB = fp16-fwd-bench-orig.dbg
-  TARGET_SUPPORT_DIR = CMakeFiles/fp16-fwd-bench-orig.dir
+  TARGET_FILE = attn_test
+  TARGET_PDB = attn_test.dbg
+  TARGET_SUPPORT_DIR = CMakeFiles/attn_test.dir
 
 
 #############################################
@@ -402,7 +285,7 @@ build fa3_prepare_scheduler: phony libfa3_prepare_scheduler.so
 #############################################
 # Folder: /home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build
 
-build all: phony libfa3_prepare_scheduler.so fp8-fwd-bench fp16-fwd-bench fp8-fwd-bench-orig fp16-fwd-bench-orig _deps/csv2-build/all _deps/argparse-build/all
+build all: phony libfa3_prepare_scheduler.so attn_test _deps/csv2-build/all _deps/argparse-build/all
 
 # =============================================================================
 

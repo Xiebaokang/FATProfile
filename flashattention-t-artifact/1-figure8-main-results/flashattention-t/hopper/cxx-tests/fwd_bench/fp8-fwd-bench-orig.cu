@@ -22,6 +22,7 @@
 // custom macros
 #define ENABLE_CUSTOM_FWD_LAUNCH_TEMPLATE_REPORT      0
 #define USE_MMA_SOFTMAX                               0 // bool
+#define USE_REUSE_KV                                  0 // bool
 
 #include "custom_api.cuh"
 

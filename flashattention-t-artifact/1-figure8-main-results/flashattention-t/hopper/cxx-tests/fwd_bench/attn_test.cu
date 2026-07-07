@@ -18,11 +18,10 @@
 #define FLASHATTENTION_DISABLE_SM8x
 #define FLASHATTENTION_DISABLE_LOCAL
 
-
 // custom macros
 #define ENABLE_CUSTOM_FWD_LAUNCH_TEMPLATE_REPORT      0
-#define USE_MMA_SOFTMAX                               1 // bool
-#define USE_REUSE_KV                                  0 // bool
+#define USE_MMA_SOFTMAX                               0 // bool
+#define USE_REUSE_KV                                  1 // bool
 
 #include "custom_api.cuh"
 
@@ -100,13 +99,25 @@ auto bench_fwd(
   cudaEventCreate(&start);
   cudaEventCreate(&stop);
 
-  auto f_run_causal = [&](){
-    custom_mha_fwd_causal<target_type, HeadDim, HeadDim>(
+  auto f_run_noncausal = [&](){
+    custom_mha_fwd_noncausal<target_type, HeadDim, HeadDim>(
       q_tensor_typed, k_tensor_typed, v_tensor_typed, out_opt, softmax_scale
     );
   };
-  auto f_run_noncausal = [&](){
-    custom_mha_fwd_noncausal<target_type, HeadDim, HeadDim>(
+
+#if USE_REUSE_KV
+  static_assert(!IsCausal, "USE_REUSE_KV experiment currently supports non-causal attention only");
+  for (int i = 0; i < warmup; ++i) {
+    f_run_noncausal();
+  }
+  
+  cudaEventRecord(start);
+  for (int iter_idx = 0; iter_idx < iter; ++iter_idx) {
+    f_run_noncausal();
+  }
+#else
+  auto f_run_causal = [&](){
+    custom_mha_fwd_causal<target_type, HeadDim, HeadDim>(
       q_tensor_typed, k_tensor_typed, v_tensor_typed, out_opt, softmax_scale
     );
   };
@@ -119,6 +130,7 @@ auto bench_fwd(
   for (int iter_idx = 0; iter_idx < iter; ++iter_idx) {
     run_selected<IsCausal>(f_run_causal, f_run_noncausal);
   }
+#endif
   cudaEventRecord(stop);
   cudaEventSynchronize(stop);
   
@@ -139,10 +151,17 @@ float bench_fwd_single(
   int iter,
   int warmup
 ){
+#if USE_REUSE_KV
+  if (is_causal) {
+    throw std::runtime_error("USE_REUSE_KV experiment currently supports non-causal attention only");
+  }
+  return bench_fwd<HeadDim, false>(batch_size, num_heads, seqlen, iter, warmup);
+#else
   if (is_causal) {
     return bench_fwd<HeadDim, true>(batch_size, num_heads, seqlen, iter, warmup);
   }
   return bench_fwd<HeadDim, false>(batch_size, num_heads, seqlen, iter, warmup);
+#endif
 }
 
 float bench_fwd_single_dispatch(
@@ -163,6 +182,7 @@ float bench_fwd_single_dispatch(
   throw std::runtime_error("single-shape mode supports head_dim 64 or 128");
 }
 
+// ./fp16-fwd-bench-orig --single --batch-size 1 --num-heads 16 --seq-len 58368 --head-dim 64 --causal 0 --iter 500 --warmup 100
 void bench_fwd_single_to_csv(int argc, char* argv[]) {
   std::string csv_filename = get_string_arg(argc, argv, "--csv", "");
   int batch_size = get_int_arg(argc, argv, "--batch-size", 1);
@@ -193,7 +213,7 @@ void bench_fwd_single_to_csv(int argc, char* argv[]) {
     };
     std::vector<std::vector<std::string>> csv_data = {{
       std::string(kBenchDataType),
-      std::string("fa-t"),
+      std::string("fa3-reuse-kv"),
       std::to_string(batch_size),
       std::to_string(num_heads),
       std::to_string(seqlen),
@@ -223,7 +243,7 @@ void bench_fwd_all(std::string const& csv_filename = ""){
     return Int<hid_dim / head_dim_v>{};
   });
 
-  constexpr auto causal_list = cute::make_tuple(cute::false_type{}, cute::true_type{});
+  constexpr auto causal_list = cute::make_tuple(cute::false_type{});
 
   constexpr auto causal_list_len = cute::rank(causal_list);
   constexpr int seqlens_len = cute::rank(seqlens);
@@ -265,7 +285,7 @@ void bench_fwd_all(std::string const& csv_filename = ""){
         );
         csv_data.push_back({
           std::string(kBenchDataType),
-          std::string("fa-t"),
+          std::string("fa3-reuse-kv"),
           std::to_string(batch_size_v),
           std::to_string(num_head_v),
           std::to_string(seqlen_v),

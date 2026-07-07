@@ -20297,3 +20297,3208 @@ events:
         12.8
       exitCode: 0
 ...
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:795 (find_path)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "path"
+    variable: "CUDA_TOOLKIT_INCLUDE"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "device_functions.h"
+    candidate_directories:
+      - "/usr/local/cuda/include/"
+      - "/usr/local/cuda/"
+    found: "/usr/local/cuda/include/"
+    search_context:
+      ENV{PATH}:
+        - "/home/xiebaokang/.codex/tmp/arg0/codex-arg00zbd1H"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-7e7950df89d055b5a378379db9ee14290772148a/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/openai.chatgpt-26.5623.61825-linux-x64/bin/linux-x86_64"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_INCLUDE_PATH:
+        - "/usr/include/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:850 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_CUDART_LIBRARY"
+    description: "\"cudart\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cudart"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libcudart.so"
+    search_context:
+      ENV{PATH}:
+        - "/home/xiebaokang/.codex/tmp/arg0/codex-arg00zbd1H"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-7e7950df89d055b5a378379db9ee14290772148a/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/openai.chatgpt-26.5623.61825-linux-x64/bin/linux-x86_64"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:852 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_cudart_static_LIBRARY"
+    description: "static CUDA runtime library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cudart_static"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libcudart_static.a"
+    search_context:
+      ENV{PATH}:
+        - "/home/xiebaokang/.codex/tmp/arg0/codex-arg00zbd1H"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-7e7950df89d055b5a378379db9ee14290772148a/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/openai.chatgpt-26.5623.61825-linux-x64/bin/linux-x86_64"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:870 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_cudadevrt_LIBRARY"
+    description: "\"cudadevrt\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cudadevrt"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libcudadevrt.a"
+    search_context:
+      ENV{PATH}:
+        - "/home/xiebaokang/.codex/tmp/arg0/codex-arg00zbd1H"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-7e7950df89d055b5a378379db9ee14290772148a/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/openai.chatgpt-26.5623.61825-linux-x64/bin/linux-x86_64"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:907 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_cupti_LIBRARY"
+    description: "\"cupti\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cupti"
+    candidate_directories:
+      - "/usr/local/cuda/extras/CUPTI/lib/x64/"
+      - "/usr/local/cuda/extras/CUPTI/lib64/"
+      - "/usr/local/cuda/extras/CUPTI/libx64/"
+      - "/usr/local/cuda/extras/CUPTI/lib/Win32/"
+      - "/usr/local/cuda/extras/CUPTI/lib/"
+      - "/usr/local/cuda/extras/CUPTI/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/extras/CUPTI/lib/x64/"
+    found: "/usr/local/cuda/extras/CUPTI/lib64/libcupti.so"
+    search_context:
+      ENV{PATH}:
+        - "/home/xiebaokang/.codex/tmp/arg0/codex-arg00zbd1H"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-7e7950df89d055b5a378379db9ee14290772148a/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/openai.chatgpt-26.5623.61825-linux-x64/bin/linux-x86_64"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:937 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_CUDA_LIBRARY"
+    description: "\"cuda\" library (older versions only)."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cuda"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "/home/xiebaokang/.codex/tmp/arg0/codex-arg00zbd1H"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-7e7950df89d055b5a378379db9ee14290772148a/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/openai.chatgpt-26.5623.61825-linux-x64/bin/linux-x86_64"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:832 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:937 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_CUDA_LIBRARY"
+    description: "\"cuda\" library (older versions only)."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cuda"
+    candidate_directories:
+      - "/home/xiebaokang/.codex/tmp/arg0/codex-arg00zbd1H/"
+      - "/home/xiebaokang/.vscode-server/cli/servers/Stable-7e7950df89d055b5a378379db9ee14290772148a/server/bin/remote-cli/"
+      - "/usr/local/cuda/bin/"
+      - "/home/xiebaokang/miniconda3/bin/"
+      - "/home/xiebaokang/miniconda3/condabin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/usr/bin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/snap/bin/"
+      - "/home/xiebaokang/.vscode-server/extensions/openai.chatgpt-26.5623.61825-linux-x64/bin/linux-x86_64/"
+      - "/usr/local/lib/x86_64-linux-gnu/"
+      - "/usr/local/lib/"
+      - "/usr/local/"
+      - "/usr/lib/x86_64-linux-gnu/"
+      - "/usr/lib/"
+      - "/usr/"
+      - "/lib/x86_64-linux-gnu/"
+      - "/lib/"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data/lib/x86_64-linux-gnu/"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data/lib/"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data/"
+      - "/usr/X11R6/lib/x86_64-linux-gnu/"
+      - "/usr/X11R6/lib/"
+      - "/usr/X11R6/"
+      - "/usr/pkg/lib/x86_64-linux-gnu/"
+      - "/usr/pkg/lib/"
+      - "/usr/pkg/"
+      - "/opt/lib/x86_64-linux-gnu/"
+      - "/opt/lib/"
+      - "/opt/"
+      - "/usr/lib/X11/"
+      - "/usr/lib/nvidia-current/"
+    searched_directories:
+      - "/home/xiebaokang/.codex/tmp/arg0/codex-arg00zbd1H/"
+      - "/home/xiebaokang/.vscode-server/cli/servers/Stable-7e7950df89d055b5a378379db9ee14290772148a/server/bin/remote-cli/"
+      - "/usr/local/cuda/bin/"
+      - "/home/xiebaokang/miniconda3/bin/"
+      - "/home/xiebaokang/miniconda3/condabin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/usr/bin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/snap/bin/"
+      - "/home/xiebaokang/.vscode-server/extensions/openai.chatgpt-26.5623.61825-linux-x64/bin/linux-x86_64/"
+      - "/usr/local/lib/x86_64-linux-gnu/"
+      - "/usr/local/lib/"
+      - "/usr/local/"
+    found: "/usr/lib/x86_64-linux-gnu/libcuda.so"
+    search_context:
+      ENV{PATH}:
+        - "/home/xiebaokang/.codex/tmp/arg0/codex-arg00zbd1H"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-7e7950df89d055b5a378379db9ee14290772148a/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/openai.chatgpt-26.5623.61825-linux-x64/bin/linux-x86_64"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:947 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:955 (find_cuda_helper_libs)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_cufft_LIBRARY"
+    description: "\"cufft\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cufft"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libcufft.so"
+    search_context:
+      ENV{PATH}:
+        - "/home/xiebaokang/.codex/tmp/arg0/codex-arg00zbd1H"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-7e7950df89d055b5a378379db9ee14290772148a/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/openai.chatgpt-26.5623.61825-linux-x64/bin/linux-x86_64"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:947 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:956 (find_cuda_helper_libs)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_cublas_LIBRARY"
+    description: "\"cublas\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cublas"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libcublas.so"
+    search_context:
+      ENV{PATH}:
+        - "/home/xiebaokang/.codex/tmp/arg0/codex-arg00zbd1H"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-7e7950df89d055b5a378379db9ee14290772148a/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/openai.chatgpt-26.5623.61825-linux-x64/bin/linux-x86_64"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:947 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:957 (find_cuda_helper_libs)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_cublasLt_LIBRARY"
+    description: "\"cublasLt\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cublasLt"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libcublasLt.so"
+    search_context:
+      ENV{PATH}:
+        - "/home/xiebaokang/.codex/tmp/arg0/codex-arg00zbd1H"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-7e7950df89d055b5a378379db9ee14290772148a/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/openai.chatgpt-26.5623.61825-linux-x64/bin/linux-x86_64"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:947 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:959 (find_cuda_helper_libs)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_cusparse_LIBRARY"
+    description: "\"cusparse\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cusparse"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libcusparse.so"
+    search_context:
+      ENV{PATH}:
+        - "/home/xiebaokang/.codex/tmp/arg0/codex-arg00zbd1H"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-7e7950df89d055b5a378379db9ee14290772148a/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/openai.chatgpt-26.5623.61825-linux-x64/bin/linux-x86_64"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:947 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:960 (find_cuda_helper_libs)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_curand_LIBRARY"
+    description: "\"curand\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "curand"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libcurand.so"
+    search_context:
+      ENV{PATH}:
+        - "/home/xiebaokang/.codex/tmp/arg0/codex-arg00zbd1H"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-7e7950df89d055b5a378379db9ee14290772148a/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/openai.chatgpt-26.5623.61825-linux-x64/bin/linux-x86_64"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:947 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:967 (find_cuda_helper_libs)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_nppc_LIBRARY"
+    description: "\"nppc\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "nppc"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libnppc.so"
+    search_context:
+      ENV{PATH}:
+        - "/home/xiebaokang/.codex/tmp/arg0/codex-arg00zbd1H"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-7e7950df89d055b5a378379db9ee14290772148a/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/openai.chatgpt-26.5623.61825-linux-x64/bin/linux-x86_64"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:947 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:978 (find_cuda_helper_libs)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_npps_LIBRARY"
+    description: "\"npps\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "npps"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libnpps.so"
+    search_context:
+      ENV{PATH}:
+        - "/home/xiebaokang/.codex/tmp/arg0/codex-arg00zbd1H"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-7e7950df89d055b5a378379db9ee14290772148a/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/openai.chatgpt-26.5623.61825-linux-x64/bin/linux-x86_64"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:947 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:981 (find_cuda_helper_libs)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_cusolver_LIBRARY"
+    description: "\"cusolver\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cusolver"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libcusolver.so"
+    search_context:
+      ENV{PATH}:
+        - "/home/xiebaokang/.codex/tmp/arg0/codex-arg00zbd1H"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-7e7950df89d055b5a378379db9ee14290772148a/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/openai.chatgpt-26.5623.61825-linux-x64/bin/linux-x86_64"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "try_run-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:99 (try_run)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    directories:
+      source: "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/CMakeFiles/CMakeTmp"
+      binary: "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/CMakeFiles/CMakeTmp"
+    cmakeVariables:
+      CMAKE_CUDA_ARCHITECTURES: "90a"
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2;/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/../Modules_CUDA_fix"
+    buildResult:
+      variable: "compile_result"
+      cached: true
+      stdout: |
+        Change Dir: '/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/CMakeFiles/CMakeTmp'
+        
+        Run Build Command(s): /home/xiebaokang/miniconda3/envs/torch/bin/ninja -v cmTC_09fb0
+        [1/2] /usr/bin/c++  -I/usr/local/cuda/include -std=gnu++20 -o CMakeFiles/cmTC_09fb0.dir/detect_cuda_version.cc.o -c /home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/detect_cuda_version.cc
+        [2/2] : && /usr/bin/c++   CMakeFiles/cmTC_09fb0.dir/detect_cuda_version.cc.o -o cmTC_09fb0  /usr/local/cuda/lib64/libcudart.so && :
+        
+      exitCode: 0
+    runResult:
+      variable: "run_result"
+      cached: true
+      stdout: |
+        12.8
+      exitCode: 0
+...
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:795 (find_path)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "path"
+    variable: "CUDA_TOOLKIT_INCLUDE"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "device_functions.h"
+    candidate_directories:
+      - "/usr/local/cuda/include/"
+      - "/usr/local/cuda/"
+    found: "/usr/local/cuda/include/"
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_INCLUDE_PATH:
+        - "/usr/include/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:850 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_CUDART_LIBRARY"
+    description: "\"cudart\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cudart"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libcudart.so"
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:852 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_cudart_static_LIBRARY"
+    description: "static CUDA runtime library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cudart_static"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libcudart_static.a"
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:870 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_cudadevrt_LIBRARY"
+    description: "\"cudadevrt\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cudadevrt"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libcudadevrt.a"
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:907 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_cupti_LIBRARY"
+    description: "\"cupti\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cupti"
+    candidate_directories:
+      - "/usr/local/cuda/extras/CUPTI/lib/x64/"
+      - "/usr/local/cuda/extras/CUPTI/lib64/"
+      - "/usr/local/cuda/extras/CUPTI/libx64/"
+      - "/usr/local/cuda/extras/CUPTI/lib/Win32/"
+      - "/usr/local/cuda/extras/CUPTI/lib/"
+      - "/usr/local/cuda/extras/CUPTI/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/extras/CUPTI/lib/x64/"
+    found: "/usr/local/cuda/extras/CUPTI/lib64/libcupti.so"
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:937 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_CUDA_LIBRARY"
+    description: "\"cuda\" library (older versions only)."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cuda"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:832 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:937 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_CUDA_LIBRARY"
+    description: "\"cuda\" library (older versions only)."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cuda"
+    candidate_directories:
+      - "/usr/local/cuda/bin/"
+      - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli/"
+      - "/home/xiebaokang/miniconda3/envs/torch/bin/"
+      - "/home/xiebaokang/miniconda3/condabin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/usr/bin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/snap/bin/"
+      - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts/"
+      - "/usr/local/lib/x86_64-linux-gnu/"
+      - "/usr/local/lib/"
+      - "/usr/local/"
+      - "/usr/lib/x86_64-linux-gnu/"
+      - "/usr/lib/"
+      - "/usr/"
+      - "/lib/x86_64-linux-gnu/"
+      - "/lib/"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data/lib/x86_64-linux-gnu/"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data/lib/"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data/"
+      - "/usr/X11R6/lib/x86_64-linux-gnu/"
+      - "/usr/X11R6/lib/"
+      - "/usr/X11R6/"
+      - "/usr/pkg/lib/x86_64-linux-gnu/"
+      - "/usr/pkg/lib/"
+      - "/usr/pkg/"
+      - "/opt/lib/x86_64-linux-gnu/"
+      - "/opt/lib/"
+      - "/opt/"
+      - "/usr/lib/X11/"
+      - "/usr/lib/nvidia-current/"
+    searched_directories:
+      - "/usr/local/cuda/bin/"
+      - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli/"
+      - "/home/xiebaokang/miniconda3/envs/torch/bin/"
+      - "/home/xiebaokang/miniconda3/condabin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/usr/bin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/snap/bin/"
+      - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts/"
+      - "/usr/local/lib/x86_64-linux-gnu/"
+      - "/usr/local/lib/"
+      - "/usr/local/"
+    found: "/usr/lib/x86_64-linux-gnu/libcuda.so"
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:947 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:955 (find_cuda_helper_libs)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_cufft_LIBRARY"
+    description: "\"cufft\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cufft"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libcufft.so"
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:947 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:956 (find_cuda_helper_libs)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_cublas_LIBRARY"
+    description: "\"cublas\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cublas"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libcublas.so"
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:947 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:957 (find_cuda_helper_libs)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_cublasLt_LIBRARY"
+    description: "\"cublasLt\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cublasLt"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libcublasLt.so"
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:947 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:959 (find_cuda_helper_libs)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_cusparse_LIBRARY"
+    description: "\"cusparse\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cusparse"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libcusparse.so"
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:947 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:960 (find_cuda_helper_libs)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_curand_LIBRARY"
+    description: "\"curand\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "curand"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libcurand.so"
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:947 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:967 (find_cuda_helper_libs)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_nppc_LIBRARY"
+    description: "\"nppc\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "nppc"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libnppc.so"
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:947 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:978 (find_cuda_helper_libs)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_npps_LIBRARY"
+    description: "\"npps\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "npps"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libnpps.so"
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:947 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:981 (find_cuda_helper_libs)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_cusolver_LIBRARY"
+    description: "\"cusolver\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cusolver"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libcusolver.so"
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "try_run-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:99 (try_run)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    directories:
+      source: "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/CMakeFiles/CMakeTmp"
+      binary: "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/CMakeFiles/CMakeTmp"
+    cmakeVariables:
+      CMAKE_CUDA_ARCHITECTURES: "90a"
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2;/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/../Modules_CUDA_fix"
+    buildResult:
+      variable: "compile_result"
+      cached: true
+      stdout: |
+        Change Dir: '/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/CMakeFiles/CMakeTmp'
+        
+        Run Build Command(s): /home/xiebaokang/miniconda3/envs/torch/bin/ninja -v cmTC_98181
+        [1/2] /usr/bin/c++  -I/usr/local/cuda/include -std=gnu++20 -o CMakeFiles/cmTC_98181.dir/detect_cuda_version.cc.o -c /home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/detect_cuda_version.cc
+        [2/2] : && /usr/bin/c++   CMakeFiles/cmTC_98181.dir/detect_cuda_version.cc.o -o cmTC_98181  /usr/local/cuda/lib64/libcudart.so && :
+        
+      exitCode: 0
+    runResult:
+      variable: "run_result"
+      cached: true
+      stdout: |
+        12.8
+      exitCode: 0
+...
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:795 (find_path)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "path"
+    variable: "CUDA_TOOLKIT_INCLUDE"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "device_functions.h"
+    candidate_directories:
+      - "/usr/local/cuda/include/"
+      - "/usr/local/cuda/"
+    found: "/usr/local/cuda/include/"
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_INCLUDE_PATH:
+        - "/usr/include/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:850 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_CUDART_LIBRARY"
+    description: "\"cudart\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cudart"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libcudart.so"
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:852 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_cudart_static_LIBRARY"
+    description: "static CUDA runtime library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cudart_static"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libcudart_static.a"
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:870 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_cudadevrt_LIBRARY"
+    description: "\"cudadevrt\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cudadevrt"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libcudadevrt.a"
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:907 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_cupti_LIBRARY"
+    description: "\"cupti\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cupti"
+    candidate_directories:
+      - "/usr/local/cuda/extras/CUPTI/lib/x64/"
+      - "/usr/local/cuda/extras/CUPTI/lib64/"
+      - "/usr/local/cuda/extras/CUPTI/libx64/"
+      - "/usr/local/cuda/extras/CUPTI/lib/Win32/"
+      - "/usr/local/cuda/extras/CUPTI/lib/"
+      - "/usr/local/cuda/extras/CUPTI/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/extras/CUPTI/lib/x64/"
+    found: "/usr/local/cuda/extras/CUPTI/lib64/libcupti.so"
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:937 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_CUDA_LIBRARY"
+    description: "\"cuda\" library (older versions only)."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cuda"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:832 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:937 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_CUDA_LIBRARY"
+    description: "\"cuda\" library (older versions only)."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cuda"
+    candidate_directories:
+      - "/usr/local/cuda/bin/"
+      - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli/"
+      - "/home/xiebaokang/miniconda3/envs/torch/bin/"
+      - "/home/xiebaokang/miniconda3/condabin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/usr/bin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/snap/bin/"
+      - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts/"
+      - "/usr/local/lib/x86_64-linux-gnu/"
+      - "/usr/local/lib/"
+      - "/usr/local/"
+      - "/usr/lib/x86_64-linux-gnu/"
+      - "/usr/lib/"
+      - "/usr/"
+      - "/lib/x86_64-linux-gnu/"
+      - "/lib/"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data/lib/x86_64-linux-gnu/"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data/lib/"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data/"
+      - "/usr/X11R6/lib/x86_64-linux-gnu/"
+      - "/usr/X11R6/lib/"
+      - "/usr/X11R6/"
+      - "/usr/pkg/lib/x86_64-linux-gnu/"
+      - "/usr/pkg/lib/"
+      - "/usr/pkg/"
+      - "/opt/lib/x86_64-linux-gnu/"
+      - "/opt/lib/"
+      - "/opt/"
+      - "/usr/lib/X11/"
+      - "/usr/lib/nvidia-current/"
+    searched_directories:
+      - "/usr/local/cuda/bin/"
+      - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli/"
+      - "/home/xiebaokang/miniconda3/envs/torch/bin/"
+      - "/home/xiebaokang/miniconda3/condabin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/usr/bin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/snap/bin/"
+      - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts/"
+      - "/usr/local/lib/x86_64-linux-gnu/"
+      - "/usr/local/lib/"
+      - "/usr/local/"
+    found: "/usr/lib/x86_64-linux-gnu/libcuda.so"
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:947 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:955 (find_cuda_helper_libs)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_cufft_LIBRARY"
+    description: "\"cufft\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cufft"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libcufft.so"
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:947 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:956 (find_cuda_helper_libs)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_cublas_LIBRARY"
+    description: "\"cublas\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cublas"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libcublas.so"
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:947 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:957 (find_cuda_helper_libs)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_cublasLt_LIBRARY"
+    description: "\"cublasLt\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cublasLt"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libcublasLt.so"
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:947 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:959 (find_cuda_helper_libs)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_cusparse_LIBRARY"
+    description: "\"cusparse\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cusparse"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libcusparse.so"
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:947 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:960 (find_cuda_helper_libs)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_curand_LIBRARY"
+    description: "\"curand\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "curand"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libcurand.so"
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:947 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:967 (find_cuda_helper_libs)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_nppc_LIBRARY"
+    description: "\"nppc\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "nppc"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libnppc.so"
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:947 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:978 (find_cuda_helper_libs)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_npps_LIBRARY"
+    description: "\"npps\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "npps"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libnpps.so"
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:821 (find_library)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:841 (cuda_find_library_local_first_with_path_ext)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:947 (cuda_find_library_local_first)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake:981 (find_cuda_helper_libs)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake:11 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:29 (find_package)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    mode: "library"
+    variable: "CUDA_cusolver_LIBRARY"
+    description: "\"cusolver\" library"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cusolver"
+    candidate_directories:
+      - "/usr/local/cuda/lib/x64/"
+      - "/usr/local/cuda/lib64/"
+      - "/usr/local/cuda/libx64/"
+      - "/usr/local/cuda/lib/Win32/"
+      - "/usr/local/cuda/lib/"
+      - "/usr/local/cuda/libWin32/"
+      - "/usr/local/cuda/"
+    searched_directories:
+      - "/usr/local/cuda/lib/x64/"
+    found: "/usr/local/cuda/lib64/libcusolver.so"
+    search_context:
+      ENV{PATH}:
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/xiebaokang/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/xiebaokang/.vscode-server/cli/servers/Stable-4fe60c8b1cdac1c4c174f2fb180d0d758272d713/server/bin/remote-cli"
+        - "/usr/local/cuda/bin"
+        - "/home/xiebaokang/miniconda3/envs/torch/bin"
+        - "/home/xiebaokang/miniconda3/condabin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/xiebaokang/.vscode-server/extensions/ms-python.debugpy-2026.6.0/bundled/scripts/noConfigScripts"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/cmake/data"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "try_run-v1"
+    backtrace:
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/cuda.cmake:99 (try_run)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake/flashVenv.cmake:32 (find_package)"
+      - "CMakeLists.txt:16 (include)"
+    directories:
+      source: "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/CMakeFiles/CMakeTmp"
+      binary: "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/CMakeFiles/CMakeTmp"
+    cmakeVariables:
+      CMAKE_CUDA_ARCHITECTURES: "90a"
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2;/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2/public/../Modules_CUDA_fix"
+    buildResult:
+      variable: "compile_result"
+      cached: true
+      stdout: |
+        Change Dir: '/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/CMakeFiles/CMakeTmp'
+        
+        Run Build Command(s): /home/xiebaokang/miniconda3/envs/torch/bin/ninja -v cmTC_64130
+        [1/2] /usr/bin/c++  -I/usr/local/cuda/include -std=gnu++20 -o CMakeFiles/cmTC_64130.dir/detect_cuda_version.cc.o -c /home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/detect_cuda_version.cc
+        [2/2] : && /usr/bin/c++   CMakeFiles/cmTC_64130.dir/detect_cuda_version.cc.o -o cmTC_64130  /usr/local/cuda/lib64/libcudart.so && :
+        
+      exitCode: 0
+    runResult:
+      variable: "run_result"
+      cached: true
+      stdout: |
+        12.8
+      exitCode: 0
+...

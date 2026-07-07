@@ -297,7 +297,7 @@ def write_png(fa3_py_rows, fa3_cpp_rows, fat_rows, output_path, dtype):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dtype", choices=("fp16", "fp8"), default="fp16")
+    parser.add_argument("--dtype", choices=("fp16", "fp8"), default="fp8")
     parser.add_argument("--ours", type=Path, default=None, help="FA3 Python results CSV")
     parser.add_argument("--fa3", type=Path, default=None)
     parser.add_argument("--fat", type=Path, default=None)

@@ -26,6 +26,10 @@
 
 #include "custom_meta.cuh"
 
+#ifndef USE_REUSE_KV
+#define USE_REUSE_KV 0
+#endif
+
 namespace flash {
 
 // check CUSTOM_OVERRIDE_SCHED_BARRIER
@@ -64,6 +68,7 @@ struct CollectiveMainloopFwdSm90 {
     static constexpr bool Transpose_V = Is_FP8 && !V_colmajor;
     static constexpr bool Use_TMA_Q = !PackGQA;
     static constexpr bool Use_TMA_KV = !PagedKVNonTMA;
+    static_assert(!USE_REUSE_KV || !IntraWGOverlap, "USE_REUSE_KV currently supports only the non-IntraWGOverlap mainloop path");
     static_assert(Use_TMA_KV || CUTE_STATIC_V(size(ClusterShape{})) == 1, "If not using TMA for KV, ClusterShape must be 1");
     static_assert(Use_TMA_KV || !V_colmajor, "If not using TMA for KV, V_colmajor is not supported");
     static constexpr bool SameHeadDim = get<2>(TileShape_MNK{}) == kHeadDimV;
@@ -913,6 +918,28 @@ struct CollectiveMainloopFwdSm90 {
             if (should_load_KV) { load_V(n_block_prev, smem_pipe_write, cute::true_type{} /*Seqlenk_mask*/); }
         }
         if constexpr (Transpose_V) { copy_Vt_to_V(smem_pipe_write); }
+#if USE_REUSE_KV
+        static_assert(Use_TMA_Q, "USE_REUSE_KV currently expects TMA Q load");
+        static_assert(!HasQv, "USE_REUSE_KV currently does not support Qv");
+        bool const has_reuse_m_block = (m_block + 1) * kBlockM < seqlen_info.seqlen_q;
+        if constexpr (Use_TMA_Q) {
+            if (has_reuse_m_block) {
+                if (SingleProducerWarp || warp_idx_in_warpgroup == 0) {
+                    cutlass::arch::NamedBarrier::sync(NumMmaThreadsQK + cutlass::NumThreadsPerWarp, static_cast<uint32_t>(FwdNamedBarriers::QueryEmpty) /*id*/);
+                }
+                if ((SingleProducerWarp || warp_idx_in_warpgroup == 0) && cute::elect_one_sync()) {
+                    Tensor gQ_reuse = local_tile(domain_offset(make_coord(seqlen_info.offset_q, _0{}), mQ),
+                                                 select<0, 2>(TileShape_MNK{}),
+                                                 make_coord(m_block + 1, _0{}));  // (M, K)
+                    Tensor tQgQ_reuse = group_modes<0, 3>(block_tma_Q.partition_S(gQ_reuse));  // (TMA)
+                    shared_storage.pipelines.barrier_Q.arrive_and_expect_tx(TmaTransactionBytesQ);
+                    copy(params.tma_load_Q.with(reinterpret_cast<typename cutlass::arch::ClusterTransactionBarrier::ValueType&>(shared_storage.pipelines.barrier_Q), 0 /*mcast_mask*/, TMA::CacheHintSm90::EVICT_FIRST),
+                        tQgQ_reuse, tQsQ);
+                }
+                ++work_idx;
+            }
+        }
+#endif
         ++smem_pipe_write;
         // At the end, all threads have the correct smem_pipe_write.
         ++work_idx;
@@ -1509,7 +1536,7 @@ struct CollectiveMainloopFwdSm90 {
         return true;
     }
 
-    template <typename SharedStorage, typename FrgTensorO, typename Softmax>
+    template <bool ReleaseKV = true, typename SharedStorage, typename FrgTensorO, typename Softmax>
     CUTLASS_DEVICE bool
     mma(Params const& params,
         MainloopPipelineK pipeline_k,
@@ -1834,7 +1861,7 @@ struct CollectiveMainloopFwdSm90 {
                 if constexpr (!HasQv) {
                     warp_scheduler_barrier_arrive();
                     warpgroup_wait<0>();
-                    pipeline_k.consumer_release(smem_pipe_read);  // release K
+                    if constexpr (ReleaseKV) { pipeline_k.consumer_release(smem_pipe_read); }  // release K
                 } else {
                     if constexpr (Is_first_iter) {
                         shared_storage.pipelines.barrier_Qv.wait(work_idx % 2);
@@ -1843,7 +1870,7 @@ struct CollectiveMainloopFwdSm90 {
                     flash::gemm</*zero_init=*/false, /*wg_wait=*/-1>(tiled_mma_qv, tSrQv, tSrV(_, _, _, smem_pipe_read.index()), tSrS);
                     warp_scheduler_barrier_arrive();
                     warpgroup_wait<1>();
-                    pipeline_k.consumer_release(smem_pipe_read);  // release K
+                    if constexpr (ReleaseKV) { pipeline_k.consumer_release(smem_pipe_read); }  // release K
                     warpgroup_wait<0>();
                 }
                 scoremod_premask_fn(tSrS);
@@ -1869,7 +1896,7 @@ struct CollectiveMainloopFwdSm90 {
                 }
                 if constexpr (!MmaPV_is_RS && MmaPV_use_RS_WG1) { arrive_on_P_write_barrier(); }
                 warpgroup_wait<0>();
-                pipeline_v.consumer_release(smem_pipe_read);  // release V
+                if constexpr (ReleaseKV) { pipeline_v.consumer_release(smem_pipe_read); }  // release V
             };
 
             auto first_iter_mask_fn = [&](auto& tSrS, int n_block) { mask.template apply<true /*Seqlenk_mask*/, Is_causal, Is_local>(tSrS, m_block, n_block); };

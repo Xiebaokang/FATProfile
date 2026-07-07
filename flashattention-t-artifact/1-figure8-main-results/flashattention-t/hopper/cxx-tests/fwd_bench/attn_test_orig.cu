@@ -18,10 +18,9 @@
 #define FLASHATTENTION_DISABLE_SM8x
 #define FLASHATTENTION_DISABLE_LOCAL
 
-
 // custom macros
 #define ENABLE_CUSTOM_FWD_LAUNCH_TEMPLATE_REPORT      0
-#define USE_MMA_SOFTMAX                               1 // bool
+#define USE_MMA_SOFTMAX                               0 // bool
 #define USE_REUSE_KV                                  0 // bool
 
 #include "custom_api.cuh"
@@ -163,6 +162,7 @@ float bench_fwd_single_dispatch(
   throw std::runtime_error("single-shape mode supports head_dim 64 or 128");
 }
 
+// ./fp16-fwd-bench-orig --single --batch-size 1 --num-heads 16 --seq-len 58368 --head-dim 64 --causal 0 --iter 500 --warmup 100
 void bench_fwd_single_to_csv(int argc, char* argv[]) {
   std::string csv_filename = get_string_arg(argc, argv, "--csv", "");
   int batch_size = get_int_arg(argc, argv, "--batch-size", 1);
@@ -193,7 +193,7 @@ void bench_fwd_single_to_csv(int argc, char* argv[]) {
     };
     std::vector<std::vector<std::string>> csv_data = {{
       std::string(kBenchDataType),
-      std::string("fa-t"),
+      std::string("fa3"),
       std::to_string(batch_size),
       std::to_string(num_heads),
       std::to_string(seqlen),
@@ -265,7 +265,7 @@ void bench_fwd_all(std::string const& csv_filename = ""){
         );
         csv_data.push_back({
           std::string(kBenchDataType),
-          std::string("fa-t"),
+          std::string("fa3"),
           std::to_string(batch_size_v),
           std::to_string(num_head_v),
           std::to_string(seqlen_v),

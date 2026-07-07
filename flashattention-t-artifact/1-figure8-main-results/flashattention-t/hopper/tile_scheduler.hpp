@@ -10,6 +10,10 @@
 #include "named_barrier.hpp"
 #include "utils.h"
 
+// #ifndef USE_REUSE_KV
+// #define USE_REUSE_KV 0
+// #endif
+
 namespace flash {
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -190,7 +194,11 @@ public:
     CUTLASS_DEVICE
     WorkTileInfo
     get_initial_work(Params const& params) const {
+#if USE_REUSE_KV
+        return {int(blockIdx.x) * 2};
+#else
         return {int(blockIdx.x)};
+#endif
     }
 
     CUTLASS_DEVICE
@@ -205,7 +213,16 @@ public:
     CUTLASS_DEVICE
     WorkTileInfo
     get_next_work(Params const& params, WorkTileInfo const& current_work) const {
+#if USE_REUSE_KV
+        int const local = current_work.tile_idx & 1;
+        if (local == 0) {
+            return {current_work.tile_idx + 1};
+        } else {
+            return {current_work.tile_idx + int(gridDim.x) * 2 - 1};
+        }
+#else
         return {current_work.tile_idx + int(gridDim.x)};
+#endif
     }
 
 };

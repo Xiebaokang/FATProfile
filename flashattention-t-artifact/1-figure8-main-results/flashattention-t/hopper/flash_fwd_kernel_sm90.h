@@ -25,6 +25,10 @@
 #error "USE_MMA_SOFTMAX must be defined to use custom API"
 #endif
 
+#ifndef USE_REUSE_KV
+#define USE_REUSE_KV 0
+#endif
+
 namespace flash {
 
 using namespace cute;
@@ -73,6 +77,17 @@ public:
     using EpilogueParams = typename CollectiveEpilogue::Params;
 
     static_assert(ArchTag::kMinComputeCapability >= 90);
+#if USE_REUSE_KV
+    static_assert(!LargeHeadDimV, "USE_REUSE_KV currently supports only non-LargeHeadDimV");
+    static_assert(!AppendKV, "USE_REUSE_KV currently does not support AppendKV");
+    static_assert(!HasQv, "USE_REUSE_KV currently does not support Qv");
+    static_assert(!Split, "USE_REUSE_KV currently does not support Split");
+    static_assert(!Varlen, "USE_REUSE_KV currently does not support Varlen");
+    static_assert(!Is_causal && !Is_local, "USE_REUSE_KV currently supports only non-causal non-local attention");
+#if USE_MMA_SOFTMAX
+    static_assert(!USE_REUSE_KV, "USE_REUSE_KV currently supports only USE_MMA_SOFTMAX=0");
+#endif
+#endif
 
     using TileScheduler = TileScheduler_;
     using TileSchedulerArguments = typename flash::TileSchedulerArguments;
@@ -340,7 +355,12 @@ public:
                  work_tile_info.is_valid(params.scheduler);
                  work_tile_info = SingleProducerWarp || warp_idx_in_warpgroup == 0 ? scheduler.template get_next_work</*IsProducerWarp=*/true>(params.scheduler, work_tile_info) : scheduler.template get_next_work</*IsProducerWarp=*/false>(params.scheduler, work_tile_info)) {
 
-                auto block_coord = work_tile_info.get_block_coord(params.scheduler);
+                auto scheduler_block_coord = work_tile_info.get_block_coord(params.scheduler);
+                auto block_coord = cute::make_tuple(
+                    get<0>(scheduler_block_coord) * (USE_REUSE_KV ? 2 : 1),
+                    get<1>(scheduler_block_coord),
+                    get<2>(scheduler_block_coord),
+                    get<3>(scheduler_block_coord));
                 SeqlenInfo_t seqlen_info{
                     get<2>(block_coord) /*bidb*/,
                     get<0>(params.mainloop.shape_Q),
@@ -388,7 +408,12 @@ public:
                  work_tile_info.is_valid(params.scheduler);
                  // get_next_work will be called before the epilogue
                  ) {
-                auto block_coord = work_tile_info.get_block_coord(params.scheduler);
+                auto scheduler_block_coord = work_tile_info.get_block_coord(params.scheduler);
+                auto block_coord = cute::make_tuple(
+                    get<0>(scheduler_block_coord) * (USE_REUSE_KV ? 2 : 1),
+                    get<1>(scheduler_block_coord),
+                    get<2>(scheduler_block_coord),
+                    get<3>(scheduler_block_coord));
                 int const bidb = get<2>(block_coord);
                 SeqlenInfo_t seqlen_info{
                     bidb,
@@ -445,7 +470,17 @@ public:
                 #endif
                 // Attention output (GEMM-II) accumulator.
                 Tensor tOrO = partition_fragment_C(tiled_mma_pv, select<0, 1>(TileShape_MNK_PV{}));
+#if USE_REUSE_KV
+                flash::Softmax<!LargeHeadDimV ? 2 * (2 * kBlockM / NumMmaThreads) : 2, /*Max_offset=*/!Is_FP8 ? 0 : 8> softmax_reuse(softmax_scale_log2);
+                Tensor tOrO_reuse = partition_fragment_C(tiled_mma_pv, select<0, 1>(TileShape_MNK_PV{}));
+                auto const block_coord_reuse = cute::make_tuple(get<0>(block_coord) + 1, get<1>(block_coord), get<2>(block_coord), get<3>(block_coord));
+                bool const has_reuse_m_block = get<0>(block_coord_reuse) * kBlockM < seqlen_info.seqlen_q;
+                PipelineState smem_pipe_read_reuse = smem_pipe_read;
+#endif
                 bool tile_valid;
+#if USE_REUSE_KV
+                bool tile_valid_reuse;
+#endif
                 // CUSTOM NOTE: static constexpr bool LargeHeadDimV = kHeadDimV > 256;
                 // So for cases that we are interested in, LargeHeadDimV === false
                 if constexpr (!LargeHeadDimV) {
@@ -454,9 +489,26 @@ public:
                         params.mainloop, pipeline_k, pipeline_v, smem_pipe_read,
                         tOrO, softmax, threadIdx.x - MmaThreadOffset, work_idx, seqlen_info, block_coord, shared_storage);
                     #else
+#if USE_REUSE_KV
+                    if (has_reuse_m_block) {
+                        tile_valid = mainloop.template mma<false>(
+                            params.mainloop, pipeline_k, pipeline_v, smem_pipe_read,
+                            tOrO, softmax, threadIdx.x - MmaThreadOffset, work_idx, seqlen_info, block_coord, shared_storage);
+                        smem_pipe_read = smem_pipe_read_reuse;
+                        tile_valid_reuse = mainloop.template mma<true>(
+                            params.mainloop, pipeline_k, pipeline_v, smem_pipe_read,
+                            tOrO_reuse, softmax_reuse, threadIdx.x - MmaThreadOffset, work_idx, seqlen_info, block_coord_reuse, shared_storage);
+                    } else {
+                        tile_valid = mainloop.template mma<true>(
+                            params.mainloop, pipeline_k, pipeline_v, smem_pipe_read,
+                            tOrO, softmax, threadIdx.x - MmaThreadOffset, work_idx, seqlen_info, block_coord, shared_storage);
+                        tile_valid_reuse = false;
+                    }
+#else
                     tile_valid = mainloop.mma(
                         params.mainloop, pipeline_k, pipeline_v, smem_pipe_read,
                         tOrO, softmax, threadIdx.x - MmaThreadOffset, work_idx, seqlen_info, block_coord, shared_storage);
+#endif
                     #endif
                 } else {  // mma_pv might not compile if !LargeHeadDimV
                     if (warp_group_idx == 1) {
@@ -494,6 +546,16 @@ public:
                     // Write 0 to gO and -inf to gLSE.
                     epilogue.store_zero(params.epilogue, threadIdx.x - MmaThreadOffset, block_coord);
                 }
+#if USE_REUSE_KV
+                if (has_reuse_m_block) {
+                    if (tile_valid_reuse) {
+                        epilogue.store(params.epilogue, tOrO_reuse, softmax_reuse.row_sum, shared_storage, tiled_mma_pv,
+                                       threadIdx.x - MmaThreadOffset, block_coord_reuse);
+                    } else {
+                        epilogue.store_zero(params.epilogue, threadIdx.x - MmaThreadOffset, block_coord_reuse);
+                    }
+                }
+#endif
             }
             epilogue.store_tail();
         }
