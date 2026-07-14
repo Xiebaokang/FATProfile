@@ -33,7 +33,7 @@ rule CUDA_SHARED_LIBRARY_LINKER__fa3_prepare_scheduler_Release
 #############################################
 # Rule for compiling CUDA files.
 
-rule CUDA_COMPILER__attn_test_unscanned_Release
+rule CUDA_COMPILER__fp8-fwd-bench_unscanned_Release
   depfile = $DEP_FILE
   deps = gcc
   command = ${LAUNCHER}${CODE_CHECK}/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -x cu -c $in -o $out
@@ -43,7 +43,64 @@ rule CUDA_COMPILER__attn_test_unscanned_Release
 #############################################
 # Rule for linking CUDA executable.
 
-rule CUDA_EXECUTABLE_LINKER__attn_test_Release
+rule CUDA_EXECUTABLE_LINKER__fp8-fwd-bench_Release
+  command = $PRE_LINK && /usr/bin/g++ $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES -L"/usr/local/cuda/targets/x86_64-linux/lib/stubs" -L"/usr/local/cuda/targets/x86_64-linux/lib" && $POST_BUILD
+  description = Linking CUDA executable $TARGET_FILE
+  restat = $RESTAT
+
+
+#############################################
+# Rule for compiling CUDA files.
+
+rule CUDA_COMPILER__fp16-fwd-bench_unscanned_Release
+  depfile = $DEP_FILE
+  deps = gcc
+  command = ${LAUNCHER}${CODE_CHECK}/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -x cu -c $in -o $out
+  description = Building CUDA object $out
+
+
+#############################################
+# Rule for linking CUDA executable.
+
+rule CUDA_EXECUTABLE_LINKER__fp16-fwd-bench_Release
+  command = $PRE_LINK && /usr/bin/g++ $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES -L"/usr/local/cuda/targets/x86_64-linux/lib/stubs" -L"/usr/local/cuda/targets/x86_64-linux/lib" && $POST_BUILD
+  description = Linking CUDA executable $TARGET_FILE
+  restat = $RESTAT
+
+
+#############################################
+# Rule for compiling CUDA files.
+
+rule CUDA_COMPILER__fp8-fwd-bench-orig_unscanned_Release
+  depfile = $DEP_FILE
+  deps = gcc
+  command = ${LAUNCHER}${CODE_CHECK}/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -x cu -c $in -o $out
+  description = Building CUDA object $out
+
+
+#############################################
+# Rule for linking CUDA executable.
+
+rule CUDA_EXECUTABLE_LINKER__fp8-fwd-bench-orig_Release
+  command = $PRE_LINK && /usr/bin/g++ $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES -L"/usr/local/cuda/targets/x86_64-linux/lib/stubs" -L"/usr/local/cuda/targets/x86_64-linux/lib" && $POST_BUILD
+  description = Linking CUDA executable $TARGET_FILE
+  restat = $RESTAT
+
+
+#############################################
+# Rule for compiling CUDA files.
+
+rule CUDA_COMPILER__fp16-fwd-bench-orig_unscanned_Release
+  depfile = $DEP_FILE
+  deps = gcc
+  command = ${LAUNCHER}${CODE_CHECK}/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -x cu -c $in -o $out
+  description = Building CUDA object $out
+
+
+#############################################
+# Rule for linking CUDA executable.
+
+rule CUDA_EXECUTABLE_LINKER__fp16-fwd-bench-orig_Release
   command = $PRE_LINK && /usr/bin/g++ $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES -L"/usr/local/cuda/targets/x86_64-linux/lib/stubs" -L"/usr/local/cuda/targets/x86_64-linux/lib" && $POST_BUILD
   description = Linking CUDA executable $TARGET_FILE
   restat = $RESTAT

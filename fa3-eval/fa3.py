@@ -25,9 +25,9 @@ def build_parser():
     )
     parser.add_argument("--B", "--batch-size", dest="B", type=int, default=1)
     parser.add_argument("--H", "--num-heads", dest="H", type=int, default=16)
-    parser.add_argument("--S", "--seq-len", dest="S", type=int, default=4096)
-    parser.add_argument("--D", "--head-dim", dest="D", type=int, default=128)
-    parser.add_argument("--dtype", choices=sorted(DTYPES), default="fp8")
+    parser.add_argument("--S", "--seq-len", dest="S", type=int, default=114*160*2)
+    parser.add_argument("--D", "--head-dim", dest="D", type=int, default=64)
+    parser.add_argument("--dtype", choices=sorted(DTYPES), default="fp16")
     parser.add_argument("--causal", type=parse_bool, default=False)
     parser.add_argument("--warmup", type=int, default=10)
     return parser

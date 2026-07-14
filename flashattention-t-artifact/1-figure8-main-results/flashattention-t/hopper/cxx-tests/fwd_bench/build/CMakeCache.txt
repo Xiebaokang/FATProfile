@@ -627,6 +627,9 @@ CUDA_nvrtc_LIBRARY:FILEPATH=/usr/local/cuda/lib64/libnvrtc.so
 //The directory containing a CMake configuration file for Caffe2.
 Caffe2_DIR:PATH=/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/site-packages/torch/share/cmake/Caffe2
 
+//Python environment with PyTorch
+FA_VENV_DIR:PATH=/home/xiebaokang/miniconda3/envs/torch
+
 //Directory under which to collect all populated content
 FETCHCONTENT_BASE_DIR:PATH=/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/fwd_bench/build/_deps
 

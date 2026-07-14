@@ -1,0 +1,11 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/test_b1_h16_s4096_d128_fp8_causal_bm128_bn128_st2_prd24_cra240_p0_q0_nc2.dir/test_b1_h16_s4096_d128_fp8_causal_bm128_bn128_st2_prd24_cra240_p0_q0_nc2.cu.o"
+  "CMakeFiles/test_b1_h16_s4096_d128_fp8_causal_bm128_bn128_st2_prd24_cra240_p0_q0_nc2.dir/test_b1_h16_s4096_d128_fp8_causal_bm128_bn128_st2_prd24_cra240_p0_q0_nc2.cu.o.d"
+  "bin/test_b1_h16_s4096_d128_fp8_causal_bm128_bn128_st2_prd24_cra240_p0_q0_nc2"
+  "bin/test_b1_h16_s4096_d128_fp8_causal_bm128_bn128_st2_prd24_cra240_p0_q0_nc2.pdb"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CUDA)
+  include(CMakeFiles/test_b1_h16_s4096_d128_fp8_causal_bm128_bn128_st2_prd24_cra240_p0_q0_nc2.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

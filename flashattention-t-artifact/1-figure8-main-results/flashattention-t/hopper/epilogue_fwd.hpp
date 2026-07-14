@@ -16,9 +16,6 @@
 #include "pack_gqa.h"
 #include "utils.h"
 
-#ifndef USE_REUSE_KV
-#define USE_REUSE_KV 0
-#endif
 
 namespace flash {
 

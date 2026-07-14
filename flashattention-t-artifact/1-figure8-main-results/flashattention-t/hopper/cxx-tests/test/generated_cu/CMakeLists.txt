@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 3.26)
+set(PROJ_NAME generated_fa3_tests)
+set(CMAKE_UTILS_DIR "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake")
+include(${CMAKE_UTILS_DIR}/cmakePrologue.cmake)
+include(${CMAKE_UTILS_DIR}/utilFuncs.cmake)
+project(${PROJ_NAME} LANGUAGES CXX CUDA)
+include(${CMAKE_UTILS_DIR}/flashVenv.cmake)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+
+add_single_source_executable("test_b1_h16_s4096_d128_fp8_causal_bm128_bn128_st2_prd24_cra240_p0_q0_nc2.cu")

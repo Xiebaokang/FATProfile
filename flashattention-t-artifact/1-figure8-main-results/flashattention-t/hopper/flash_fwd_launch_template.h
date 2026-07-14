@@ -24,9 +24,6 @@
 
 #include <type_traits>
 
-#ifndef USE_REUSE_KV
-#define USE_REUSE_KV 0
-#endif
 
 using namespace cute;
 
@@ -57,19 +54,7 @@ void run_flash_fwd(Flash_fwd_params &params, cudaStream_t stream) {
     static_assert(!(Is_causal && Is_local), "Causal and Local cannot be enabled at the same time");
     static_assert(!(AppendKV && V_colmajor), "AppendKV and V_colmajor cannot be enabled at the same time");
     static_assert(!(AppendKV && !Varlen), "AppendKV requires Varlen");
-#if USE_REUSE_KV
-    static constexpr int ReuseKVFactor = 2;
-    static_assert(Arch >= 90, "USE_REUSE_KV only supports SM90 for now");
-    static_assert(ClusterM == 1, "USE_REUSE_KV only supports ClusterM == 1 for now");
-    static_assert(!Is_causal, "USE_REUSE_KV does not support causal attention yet");
-    static_assert(!Is_local, "USE_REUSE_KV does not support local attention yet");
-    static_assert(!Varlen, "USE_REUSE_KV does not support varlen yet");
-    static_assert(!Split, "USE_REUSE_KV does not support split yet");
-    static_assert(!AppendKV, "USE_REUSE_KV does not support AppendKV yet");
-    static_assert(!PackGQA, "USE_REUSE_KV does not support PackGQA yet");
-#else
-    static constexpr int ReuseKVFactor = 1;
-#endif
+
     static constexpr bool Is_FP8 = cute::is_same_v<Element, cutlass::float_e4m3_t> || cute::is_same_v<Element, cutlass::float_e5m2_t>;
     static constexpr bool FP8_TransposeV = Is_FP8 && !V_colmajor;
     using ArchTag = std::conditional_t<Arch >= 90, cutlass::arch::Sm90, cutlass::arch::Sm80>;
@@ -81,9 +66,10 @@ void run_flash_fwd(Flash_fwd_params &params, cudaStream_t stream) {
     static constexpr int kBlockN = Arch >= 90 ? std::get<1>(kBlockMN_RS_IntraWGOverlap) : std::get<1>(kBlockMN_kNWarps_Stages_RS);
     static constexpr bool MmaPV_is_RS = std::get<2>(kBlockMN_RS_IntraWGOverlap);
 
-    static constexpr bool IntraWGOverlap = USE_REUSE_KV ? false : std::get<3>(kBlockMN_RS_IntraWGOverlap);
+    static constexpr bool IntraWGOverlap = std::get<3>(kBlockMN_RS_IntraWGOverlap);
     
     static constexpr int kNWarps = std::get<2>(kBlockMN_kNWarps_Stages_RS);
+    // 这个对应NUM_SMEM，而num_stage固定为2
     static constexpr int kStages = Arch >= 90 ? 2 : std::get<3>(kBlockMN_kNWarps_Stages_RS);
     static constexpr bool Q_in_regs = Arch >= 90 ? false : std::get<4>(kBlockMN_kNWarps_Stages_RS);
 
@@ -303,19 +289,7 @@ void run_flash_fwd_custom(Flash_fwd_params &params, cudaStream_t stream) {
     static_assert(!(Is_causal && Is_local), "Causal and Local cannot be enabled at the same time");
     static_assert(!(AppendKV && V_colmajor), "AppendKV and V_colmajor cannot be enabled at the same time");
     static_assert(!(AppendKV && !Varlen), "AppendKV requires Varlen");
-#if USE_REUSE_KV
-    static constexpr int ReuseKVFactor = 2;
-    static_assert(Arch >= 90, "USE_REUSE_KV only supports SM90 for now");
-    static_assert(ClusterM == 1, "USE_REUSE_KV only supports ClusterM == 1 for now");
-    static_assert(!Is_causal, "USE_REUSE_KV does not support causal attention yet");
-    static_assert(!Is_local, "USE_REUSE_KV does not support local attention yet");
-    static_assert(!Varlen, "USE_REUSE_KV does not support varlen yet");
-    static_assert(!Split, "USE_REUSE_KV does not support split yet");
-    static_assert(!AppendKV, "USE_REUSE_KV does not support AppendKV yet");
-    static_assert(!PackGQA, "USE_REUSE_KV does not support PackGQA yet");
-#else
-    static constexpr int ReuseKVFactor = 1;
-#endif
+
     static constexpr bool Is_FP8 = cute::is_same_v<Element, cutlass::float_e4m3_t> || cute::is_same_v<Element, cutlass::float_e5m2_t>;
     static constexpr bool FP8_TransposeV = Is_FP8 && !V_colmajor;
 
@@ -334,10 +308,8 @@ void run_flash_fwd_custom(Flash_fwd_params &params, cudaStream_t stream) {
     static constexpr int kBlockM = Arch >= 90 ? std::get<0>(kBlockMN_RS_IntraWGOverlap) : std::get<0>(kBlockMN_kNWarps_Stages_RS);
     static constexpr int kBlockN = Arch >= 90 ? std::get<1>(kBlockMN_RS_IntraWGOverlap) : std::get<1>(kBlockMN_kNWarps_Stages_RS);
     static constexpr bool MmaPV_is_RS = std::get<2>(kBlockMN_RS_IntraWGOverlap);
-    
-    #if USE_REUSE_KV
-    static constexpr bool IntraWGOverlap = false;
-    #elif ENABLE_CUSTOM_SM90_INTRAWG_ONLY_OVERRIDE
+
+    #if ENABLE_CUSTOM_SM90_INTRAWG_ONLY_OVERRIDE
     static constexpr bool IntraWGOverlap = CUSTOM_OVERRIDE_INTRA_WG;
     #else
     static constexpr bool IntraWGOverlap = std::get<3>(kBlockMN_RS_IntraWGOverlap);
@@ -520,23 +492,6 @@ void run_mha_fwd_custom_(Flash_fwd_params &params, cudaStream_t stream) {
     static_assert(sizeof(T) == 2 || sizeof(T) == 1, "Only 16bit and 8bit are supported");
     static constexpr bool Is_FP8 = cute::is_same_v<T, cutlass::float_e4m3_t> || cute::is_same_v<T, cutlass::float_e5m2_t>;
     using T_out = std::conditional_t<!Is_FP8, T, cutlass::bfloat16_t>;
-#if USE_REUSE_KV
-    TORCH_CHECK(!params.is_causal, "USE_REUSE_KV does not support causal attention yet");
-    TORCH_CHECK(!params.is_local, "USE_REUSE_KV does not support local attention yet");
-    TORCH_CHECK(params.cu_seqlens_q == nullptr && params.cu_seqlens_k == nullptr &&
-                params.seqused_q == nullptr && params.seqused_k == nullptr && params.leftpad_k == nullptr,
-                "USE_REUSE_KV does not support varlen yet");
-    TORCH_CHECK(params.knew_ptr == nullptr, "USE_REUSE_KV does not support AppendKV yet");
-    TORCH_CHECK(params.qv_ptr == nullptr, "USE_REUSE_KV does not support Qv yet");
-    static constexpr bool Is_causal = false;
-    static constexpr bool Is_local = false;
-    static constexpr bool Varlen = false;
-    static constexpr bool V_colmajor = false;
-    static constexpr bool AppendKV = false;
-    static constexpr bool HasQv = false;
-    static constexpr int ClusterM = 1;
-    run_flash_fwd_custom<Arch, kHeadDim, kHeadDimV, ClusterM, T, T_out, Is_causal, Is_local, Has_softcap, Varlen, PagedKVNonTMA, AppendKV, HasQv, PackGQA, Split, V_colmajor>(params, stream);
-#else
     CAUSAL_LOCAL_SWITCH(params.is_causal, params.is_local, Is_causal, Is_local, [&] {
         VCOLMAJOR_SWITCH(params.v_dim_stride != 1, V_colmajor_, [&] {
             static constexpr bool V_colmajor = V_colmajor_ && sizeof(T) == 1;
@@ -559,5 +514,4 @@ void run_mha_fwd_custom_(Flash_fwd_params &params, cudaStream_t stream) {
             });
         });
     });
-#endif
 }

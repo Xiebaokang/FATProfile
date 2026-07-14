@@ -261,7 +261,11 @@ inline int get_num_splits(Flash_fwd_params const& params) {
   #endif
 }
 
+#if USE_MIX_WGMMA
+template <auto Config, typename Dtype, int HeadDim, int HeadDimV, bool IsCausal>
+#else
 template <typename Dtype, int HeadDim, int HeadDimV, bool IsCausal>
+#endif
 std::vector<at::Tensor> custom_mha_fwd_template_core(
     at::Tensor &q, // (b, s_q, h, d) or (total_q, h, d) if there is cu_seqlens_q
     const at::Tensor &k, // (b_k, s_k, h_k, d) or (total_k, h_k, d) if there is cu_seqlens_k
@@ -816,7 +820,11 @@ std::vector<at::Tensor> custom_mha_fwd_template_core(
   return {out, softmax_lse, out_accum, softmax_lse_accum};
 }
 
+#if USE_MIX_WGMMA
+template <auto Config, class Dtype, int HeadDim, int HeadDimV>
+#else
 template <class Dtype, int HeadDim, int HeadDimV>
+#endif
 std::vector<at::Tensor> custom_mha_fwd_noncausal(
   at::Tensor &q, // (b, s_q, h, d) or (total_q, h, d) if there is cu_seqlens_q
   const at::Tensor &k, // (b_k, s_k, h_k, d) or (total_k, h_k, d) if there is cu_seqlens_k
@@ -832,6 +840,20 @@ std::vector<at::Tensor> custom_mha_fwd_noncausal(
   std::optional<bool> pack_gqa_ = std::nullopt,
   int const sm_margin = 0
 ){
+#if USE_MIX_WGMMA
+  return custom_mha_fwd_template_core<Config, Dtype, HeadDim, HeadDimV, false>(
+    q,
+    k,
+    v,
+    out_,
+    softmax_scale,
+    window_size_left,
+    window_size_right,
+    softcap,
+    num_splits,
+    pack_gqa_,
+    sm_margin);
+#else
   return custom_mha_fwd_template_core<Dtype, HeadDim, HeadDimV, false>(
     q,
     k,
@@ -844,9 +866,14 @@ std::vector<at::Tensor> custom_mha_fwd_noncausal(
     num_splits,
     pack_gqa_,
     sm_margin);
-}
+#endif
 
+}
+#if USE_MIX_WGMMA
+template <auto Config, class Dtype, int HeadDim, int HeadDimV>
+#else
 template <class Dtype, int HeadDim, int HeadDimV>
+#endif
 std::vector<at::Tensor> custom_mha_fwd_causal(
   at::Tensor &q, // (b, s_q, h, d) or (total_q, h, d) if there is cu_seqlens_q
   const at::Tensor &k, // (b_k, s_k, h_k, d) or (total_k, h_k, d) if there is cu_seqlens_k
@@ -862,6 +889,20 @@ std::vector<at::Tensor> custom_mha_fwd_causal(
   std::optional<bool> pack_gqa_ = std::nullopt,
   int const sm_margin = 0
 ){
+#if USE_MIX_WGMMA
+  return custom_mha_fwd_template_core<Config, Dtype, HeadDim, HeadDimV, true>(
+    q,
+    k,
+    v,
+    out_,
+    softmax_scale,
+    window_size_left,
+    window_size_right,
+    softcap,
+    num_splits,
+    pack_gqa_,
+    sm_margin);
+#else
   return custom_mha_fwd_template_core<Dtype, HeadDim, HeadDimV, true>(
     q,
     k,
@@ -874,8 +915,8 @@ std::vector<at::Tensor> custom_mha_fwd_causal(
     num_splits,
     pack_gqa_,
     sm_margin);
+#endif
 }
-
 
 // helper function for converting torch tensor types
 

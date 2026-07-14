@@ -1,0 +1,16 @@
+[
+  {
+    "source": "test_b1_h16_s4096_d128_fp8_causal_bm128_bn128_st2_prd24_cra240_p0_q0_nc2.cu",
+    "executable": "test_b1_h16_s4096_d128_fp8_causal_bm128_bn128_st2_prd24_cra240_p0_q0_nc2",
+    "config": {
+      "kBlockM": 128,
+      "kBlockN": 128,
+      "kStage": 2,
+      "producer_reg_dealloc": 24,
+      "consumer_reg_alloc": 240,
+      "p_smem_k_tiles": 0,
+      "q_reg_k_tiles": 0,
+      "num_consumer": 2
+    }
+  }
+]

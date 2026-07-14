@@ -26,10 +26,6 @@
 
 #include "custom_meta.cuh"
 
-#ifndef USE_REUSE_KV
-#define USE_REUSE_KV 0
-#endif
-
 namespace flash {
 
 // check CUSTOM_OVERRIDE_SCHED_BARRIER
@@ -43,7 +39,8 @@ using namespace cute;
 
 template <int Stages, class ClusterShape_, class TileShape_MNK_, int kHeadDimV, class Element_, class ElementAccum_, class ArchTag_,
         bool Is_causal_, bool Is_local_, bool Has_softcap_, bool Varlen_, bool PagedKVNonTMA_, bool AppendKV_, bool HasQv_,
-        bool MmaPV_is_RS, bool IntraWGOverlap, bool PackGQA_, bool Split_, bool V_colmajor_>
+        bool MmaPV_is_RS, bool IntraWGOverlap, bool PackGQA_, bool Split_, bool V_colmajor_,
+        int ProducerRegDealloc_ = 0, int ConsumerRegAlloc_ = 0>
 struct CollectiveMainloopFwdSm90 {
 
     static constexpr int kStages = Stages;
@@ -68,7 +65,6 @@ struct CollectiveMainloopFwdSm90 {
     static constexpr bool Transpose_V = Is_FP8 && !V_colmajor;
     static constexpr bool Use_TMA_Q = !PackGQA;
     static constexpr bool Use_TMA_KV = !PagedKVNonTMA;
-    static_assert(!USE_REUSE_KV || !IntraWGOverlap, "USE_REUSE_KV currently supports only the non-IntraWGOverlap mainloop path");
     static_assert(Use_TMA_KV || CUTE_STATIC_V(size(ClusterShape{})) == 1, "If not using TMA for KV, ClusterShape must be 1");
     static_assert(Use_TMA_KV || !V_colmajor, "If not using TMA for KV, V_colmajor is not supported");
     static constexpr bool SameHeadDim = get<2>(TileShape_MNK{}) == kHeadDimV;
@@ -132,6 +128,7 @@ struct CollectiveMainloopFwdSm90 {
 
     static constexpr int NumMmaThreadsQK = size(TiledMmaQK{});
     static constexpr int NumMmaThreads = size(TiledMmaPV{});
+    // Transpose_V要是转置时生产者才有128个线程
     static constexpr int NumProducerThreads = !Transpose_V && Use_TMA_KV && Use_TMA_Q ? cutlass::NumThreadsPerWarp : cutlass::NumThreadsPerWarpGroup;
     static_assert(NumMmaThreadsQK % cutlass::NumThreadsPerWarpGroup == 0);
     static_assert(NumMmaThreads % cutlass::NumThreadsPerWarpGroup == 0);
@@ -690,12 +687,15 @@ struct CollectiveMainloopFwdSm90 {
         Tensor mK_TMA = params.tma_load_K.get_tma_tensor(params.shape_K)(_, _, bidh_kv, _);
         auto shape_V = make_shape(params.headdim_v, get<0>(params.shape_K), get<2>(params.shape_K), get<3>(params.shape_K));
         Tensor mVt_TMA = params.tma_load_V.get_tma_tensor(shape_V)(_, _, bidh_kv, _);
-
+        // 定位 global-memory tile
         Tensor gQ = local_tile(domain_offset(make_coord(seqlen_info.offset_q, _0{}), mQ), select<0, 2>(TileShape_MNK{}), make_coord(m_block, _0{}));  // (M, K)
         // if (cute::thread0()) { printf("Varlen = %d, params.leftpad_k = %p, leftpad_k = %d\n", Varlen, params.leftpad_k, leftpad_k); }
+        // 所有候选 K blocks
         Tensor gK_TMA = local_tile(domain_offset(make_coord(seqlen_info.offset_k, _0{}, _0{}), mK_TMA), select<1, 2>(TileShape_MNK{}), make_coord(_, _0{}, _));  // (N, K, _, _)
+        // 所有候选 V blocks
         Tensor gVt_TMA = local_tile(domain_offset(make_coord(_0{}, seqlen_info.offset_k, _0{}), mVt_TMA), select<1, 2>(TileShape_MNK_PV{}), make_coord(_0{}, _, _));  // (K, N, _, _)
-
+        
+        // 分成适合 TMA 发起的分片
         auto block_tma_Q = params.tma_load_Q.get_slice(_0{});
         Tensor tQgQ = group_modes<0, 3>(block_tma_Q.partition_S(gQ));  // (TMA)
         Tensor tQsQ = group_modes<0, 3>(block_tma_Q.partition_D(sQ));  // (TMA)
@@ -751,6 +751,8 @@ struct CollectiveMainloopFwdSm90 {
         static constexpr int Transpose_ILP = (size<2>(tTranssVt_) * size<3>(tTranssVt_)) % 2 == 0 ? 2 : 1;
         Tensor tTranssVt = logical_divide(group_modes<1, rank(tTranssVt_) - 1>(tTranssVt_), Shape<Underscore, Int<Transpose_ILP>>{});  // ((16, 1), (2, kHeadDim / 64 * kBlockN / 32 / 2), kStages)
         Tensor tTranssV = logical_divide(group_modes<1, rank(tTranssV_) - 1>(tTranssV_), Shape<Underscore, Int<Transpose_ILP>>{});  // ((16, 1), (2, kHeadDim / 64 * kBlockN / 32 / 2), kStages)
+        
+        // Transpose_V == false (fp16), Transpose_V == true (fp8)
         auto transpose_V = [&](int stage) {
             if constexpr (Transpose_V) {
                 #pragma unroll
@@ -822,7 +824,9 @@ struct CollectiveMainloopFwdSm90 {
             cutlass::arch::NamedBarrier::sync(cutlass::NumThreadsPerWarpGroup, cutlass::arch::ReservedNamedBarriers::TransposeBarrier /*id*/);
             pipeline_vt.consumer_release(smem_pipe_read);
         };
+        
 
+        // 首轮先加载最右侧 K block，倒序处理
         int n_block = n_block_max - 1;
 
         int warp_idx_in_warpgroup = __shfl_sync(0xffffffff, (threadIdx.x / 32) % 4, 0);
@@ -830,12 +834,15 @@ struct CollectiveMainloopFwdSm90 {
         static constexpr bool SingleProducerWarp = NumProducerThreads == cutlass::NumThreadsPerWarp;
         bool should_load_KV = !Use_TMA_KV || ((SingleProducerWarp || warp_idx_in_warpgroup == 0) && cute::elect_one_sync());
 
+        // Transpose_V == false (fp16), Transpose_V == true (fp8)
         if (should_load_KV) {
             if constexpr (PagedKVNonTMA) {
                 paged_kv_manager.template load_page_table<true /*Seqlenk_mask*/, true /*First_iter*/>(n_block);
             } else {
                 paged_kv_manager.template load_page_table_TMA<true /*First_iter*/>(n_block);
             }
+            // load KV
+            // 因为 V 还需要经过额外的转置流水线，可以更早启动。
             if constexpr (Transpose_V) { load_V(n_block, smem_pipe_write, cute::true_type{} /*Seqlenk_mask*/); }
             // if (thread_idx == 0) { printf("Producer: main load, before load_K, index = %d\n", smem_pipe_write.index());}
             load_K(n_block, smem_pipe_write, cute::true_type{} /*Seqlenk_mask*/);
@@ -848,6 +855,7 @@ struct CollectiveMainloopFwdSm90 {
                 cutlass::arch::NamedBarrier::sync(NumMmaThreadsQK + cutlass::NumThreadsPerWarp, static_cast<uint32_t>(FwdNamedBarriers::QueryEmpty) /*id*/);
             }
 
+            // load Q
             if ((SingleProducerWarp || warp_idx_in_warpgroup == 0) && cute::elect_one_sync()) {
                 shared_storage.pipelines.barrier_Q.arrive_and_expect_tx(TmaTransactionBytesQ);
                 copy(params.tma_load_Q.with(reinterpret_cast<typename cutlass::arch::ClusterTransactionBarrier::ValueType&>(shared_storage.pipelines.barrier_Q), 0 /*mcast_mask*/, !Split ? TMA::CacheHintSm90::EVICT_FIRST : TMA::CacheHintSm90::EVICT_LAST),
@@ -882,12 +890,16 @@ struct CollectiveMainloopFwdSm90 {
         // Need ClusterBarrier, not just NamedBarrier. Otherwise we might have CTA 0 finishing the
         // TMA store on O first, call TMA multicast load on V, before CTA 1 can finishing TMA store on O.
         // if (thread_idx == 0) { printf("Producer: main load, before barrier_O, work_idx = %d\n", work_idx);}
+        // 完事后等待smemO的写回
         shared_storage.pipelines.barrier_O.wait((work_idx + 1) % 2);
         // if (thread_idx == 0) { printf("Producer: main load, after barrier_O\n");}
 
+        // Transpose_V == false (fp16), Transpose_V == true (fp8)
         if constexpr (!Transpose_V && !IntraWGOverlap) {
             if (should_load_KV) { load_V(n_block, smem_pipe_write, cute::true_type{} /*Seqlenk_mask*/); }
         }
+        // 前面正常KQ加载
+        // 从这里开始从
         int n_block_prev = n_block;
         --n_block;
         #pragma unroll (!Transpose_V && Use_TMA_KV ? 2 : 1)
@@ -918,28 +930,6 @@ struct CollectiveMainloopFwdSm90 {
             if (should_load_KV) { load_V(n_block_prev, smem_pipe_write, cute::true_type{} /*Seqlenk_mask*/); }
         }
         if constexpr (Transpose_V) { copy_Vt_to_V(smem_pipe_write); }
-#if USE_REUSE_KV
-        static_assert(Use_TMA_Q, "USE_REUSE_KV currently expects TMA Q load");
-        static_assert(!HasQv, "USE_REUSE_KV currently does not support Qv");
-        bool const has_reuse_m_block = (m_block + 1) * kBlockM < seqlen_info.seqlen_q;
-        if constexpr (Use_TMA_Q) {
-            if (has_reuse_m_block) {
-                if (SingleProducerWarp || warp_idx_in_warpgroup == 0) {
-                    cutlass::arch::NamedBarrier::sync(NumMmaThreadsQK + cutlass::NumThreadsPerWarp, static_cast<uint32_t>(FwdNamedBarriers::QueryEmpty) /*id*/);
-                }
-                if ((SingleProducerWarp || warp_idx_in_warpgroup == 0) && cute::elect_one_sync()) {
-                    Tensor gQ_reuse = local_tile(domain_offset(make_coord(seqlen_info.offset_q, _0{}), mQ),
-                                                 select<0, 2>(TileShape_MNK{}),
-                                                 make_coord(m_block + 1, _0{}));  // (M, K)
-                    Tensor tQgQ_reuse = group_modes<0, 3>(block_tma_Q.partition_S(gQ_reuse));  // (TMA)
-                    shared_storage.pipelines.barrier_Q.arrive_and_expect_tx(TmaTransactionBytesQ);
-                    copy(params.tma_load_Q.with(reinterpret_cast<typename cutlass::arch::ClusterTransactionBarrier::ValueType&>(shared_storage.pipelines.barrier_Q), 0 /*mcast_mask*/, TMA::CacheHintSm90::EVICT_FIRST),
-                        tQgQ_reuse, tQsQ);
-                }
-                ++work_idx;
-            }
-        }
-#endif
         ++smem_pipe_write;
         // At the end, all threads have the correct smem_pipe_write.
         ++work_idx;
@@ -1536,6 +1526,7 @@ struct CollectiveMainloopFwdSm90 {
         return true;
     }
 
+    
     template <bool ReleaseKV = true, typename SharedStorage, typename FrgTensorO, typename Softmax>
     CUTLASS_DEVICE bool
     mma(Params const& params,
@@ -1551,13 +1542,13 @@ struct CollectiveMainloopFwdSm90 {
         SharedStorage& shared_storage
         ) {
         static_assert(is_rmem<FrgTensorO>::value, "O tensor must be rmem resident.");
-        static constexpr int kBlockM = get<0>(TileShape_MNK{});
-        static constexpr int kBlockN = get<1>(TileShape_MNK{});
+        static constexpr int kBlockM = get<0>(TileShape_MNK{});   // BM
+        static constexpr int kBlockN = get<1>(TileShape_MNK{});   // BN
 
         // can't use auto [m_block, ...] = block_coord since structured binding cannot be captured in lambda
-        int const m_block = get<0>(block_coord);
-        int const bidh = get<1>(block_coord);
-        int const bidb = get<2>(block_coord);
+        int const m_block = get<0>(block_coord);  // by
+        int const bidh = get<1>(block_coord);  // head_num
+        int const bidb = get<2>(block_coord);  // batch_size
         int const split_idx = get<3>(block_coord);
         int const bidh_kv = !PackGQA ? params.qhead_per_khead_divmod.divide(bidh) : bidh;
         auto [n_block_min, n_block_max] = BlockMN_t::get_n_block_min_max(

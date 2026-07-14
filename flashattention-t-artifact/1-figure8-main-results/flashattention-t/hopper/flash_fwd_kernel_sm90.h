@@ -25,9 +25,6 @@
 #error "USE_MMA_SOFTMAX must be defined to use custom API"
 #endif
 
-#ifndef USE_REUSE_KV
-#define USE_REUSE_KV 0
-#endif
 
 namespace flash {
 
@@ -77,17 +74,6 @@ public:
     using EpilogueParams = typename CollectiveEpilogue::Params;
 
     static_assert(ArchTag::kMinComputeCapability >= 90);
-#if USE_REUSE_KV
-    static_assert(!LargeHeadDimV, "USE_REUSE_KV currently supports only non-LargeHeadDimV");
-    static_assert(!AppendKV, "USE_REUSE_KV currently does not support AppendKV");
-    static_assert(!HasQv, "USE_REUSE_KV currently does not support Qv");
-    static_assert(!Split, "USE_REUSE_KV currently does not support Split");
-    static_assert(!Varlen, "USE_REUSE_KV currently does not support Varlen");
-    static_assert(!Is_causal && !Is_local, "USE_REUSE_KV currently supports only non-causal non-local attention");
-#if USE_MMA_SOFTMAX
-    static_assert(!USE_REUSE_KV, "USE_REUSE_KV currently supports only USE_MMA_SOFTMAX=0");
-#endif
-#endif
 
     using TileScheduler = TileScheduler_;
     using TileSchedulerArguments = typename flash::TileSchedulerArguments;
@@ -114,25 +100,30 @@ public:
     static constexpr int mainloop_smem_padding_ = int(sizeof(typename CollectiveEpilogue::TensorStorage)) - int(sizeof(decltype((typename CollectiveMainloop::TensorStorage{}).smem_v)));
     static constexpr int mainloop_smem_padding = mainloop_smem_padding_ < 0 ? 0 : mainloop_smem_padding_;
     struct SharedStorage {
-        struct TensorStorage : cute::aligned_struct<128, _1> {
+        struct TensorStorage : cute::aligned_struct<128, _1> {  // smem_q/k/v是128byte对齐
             union {
                 struct {
+                    // 仅仅使用smem_v去给smem_o重用
+                    // 持久化线程块，在给smem_o（smem_v）写东西的时候，已经在给smem_k/q进行写入了
                     cute::array<uint32_t, mainloop_smem_padding / sizeof(uint32_t)> padding_;
                     typename CollectiveMainloop::TensorStorage mainloop;
                 };
                 // We want smem_o to line up with the start of smem_v
-                typename CollectiveEpilogue::TensorStorage epilogue;
+                typename CollectiveEpilogue::TensorStorage epilogue;    // smem_o
             };
         } tensors;
         struct PipelineStorage : cute::aligned_struct<16, _1> {
-            alignas(16) BarrierQ barrier_Q;
-            alignas(16) BarrierQ barrier_Qv;
-            alignas(16) cutlass::arch::ClusterBarrier barrier_O;
-            alignas(16) typename CollectiveMainloop::MainloopPipelineK::SharedStorage pipeline_k;
-            alignas(16) typename CollectiveMainloop::MainloopPipelineV::SharedStorage pipeline_v;
+            alignas(16) BarrierQ barrier_Q;  // BarrierQ
+            alignas(16) BarrierQ barrier_Qv;  // 额外 Qv 张量的barrier
+            alignas(16) cutlass::arch::ClusterBarrier barrier_O;  // O写回到glob后，通知加载smemV
+            alignas(16) typename CollectiveMainloop::MainloopPipelineK::SharedStorage pipeline_k;  // 流水线K的Barrier
+            alignas(16) typename CollectiveMainloop::MainloopPipelineV::SharedStorage pipeline_v;  // 流水线V的Barrier
+            // 取决于 Transpose_V 等编译期配置
             alignas(16) typename CollectiveMainloop::MainloopPipelineVt::SharedStorage pipeline_vt;
+            // 用于 AppendKV 场景
             alignas(16) typename CollectiveMainloop::MainloopPipelineKVNew::SharedStorage pipeline_k_new;
             alignas(16) typename CollectiveMainloop::MainloopPipelineKVNew::SharedStorage pipeline_v_new;
+            // 协调这个 CTA 接下来处理哪个 attention tile
             alignas(16) typename TileScheduler::SharedStorage smem_scheduler;
         } pipelines;
 
@@ -230,10 +221,12 @@ public:
         int warp_group_idx = cutlass::canonical_warp_group_idx();
 
         if (warp_idx == 0 && lane_predicate) {
+            // load Q init
             shared_storage.pipelines.barrier_Q.init(Use_TMA_Q ? 1 : NumProducerThreads /*numThreads*/);
             if constexpr (HasQv) {
                 shared_storage.pipelines.barrier_Qv.init(Use_TMA_Q ? 1 : NumProducerThreads /*numThreads*/);
             }
+            // store O init
             shared_storage.pipelines.barrier_O.init(size(ClusterShape{}) * (Use_TMA_O ? 1 : NumMmaThreads) /*numThreads*/);
         }
 
@@ -262,6 +255,7 @@ public:
 
         MainloopPipelineK pipeline_k = [&] {
             if constexpr (Use_TMA_KV) {
+                // load K init
                 return MainloopPipelineK(shared_storage.pipelines.pipeline_k, pipeline_params_k, ClusterShape{});
             } else {
                 return MainloopPipelineK(shared_storage.pipelines.pipeline_k, pipeline_params_k);
@@ -277,6 +271,7 @@ public:
                     return MainloopPipelineV(shared_storage.pipelines.pipeline_v, pipeline_params_vt);
                 }
             } else {
+                // load V init
                 PipelineParamsV pipeline_params_v;
                 pipeline_params_v.role = warp_group_idx == 0
                     ? MainloopPipelineV::ThreadCategory::Producer
@@ -317,6 +312,7 @@ public:
         CollectiveMainloop mainloop;
         CollectiveEpilogue epilogue;
 
+        // 第一次同步
         // We need this to guarantee that the Pipeline init is visible to all producers and consumer blocks in the Cluster
         if constexpr (size(ClusterShape{}) > 1) {
             cute::cluster_arrive_relaxed();
@@ -325,6 +321,7 @@ public:
             __syncthreads();
         }
 
+        // scheduler调度器似乎是放在shared memory中的
         TileScheduler scheduler(reinterpret_cast<typename TileScheduler::SharedStorage*>(&shared_storage.pipelines.smem_scheduler));
 
         if (warp_group_idx == 0) {  // Producer
@@ -341,23 +338,28 @@ public:
             PipelineState smem_pipe_write = cutlass::make_producer_start_state<MainloopPipelineK>();
             PipelineState smem_pipe_write_new = cutlass::make_producer_start_state<MainloopPipelineKVNew>();
             int work_idx = 0;
+            // warpgroup内部warp的索引
             int warp_idx_in_warpgroup = __shfl_sync(0xffffffff, (threadIdx.x / 32) % 4, 0);
+            // 单生产者warp
             static constexpr bool SingleProducerWarp = NumProducerThreads == cutlass::NumThreadsPerWarp;
             if constexpr (SingleProducerWarp) {
                 if (warp_idx_in_warpgroup != 0) { return; }
             }
+            // warpgroup的生产者路径，non-causal才有init_consumer
             if (!SingleProducerWarp && warp_idx_in_warpgroup != 0) { scheduler.init_consumer(); }
-
+            //这样可以让下一个 kernel 的 prolog 与当前 kernel 的 tail 重叠执行
             cutlass::arch::wait_on_dependent_grids();
 
             // Load Q, K, V
             for (auto work_tile_info = SingleProducerWarp || warp_idx_in_warpgroup == 0 ? scheduler.template get_initial_work</*IsProducerWarp=*/true>(params.scheduler) : scheduler.template get_initial_work</*IsProducerWarp=*/false>(params.scheduler);
-                 work_tile_info.is_valid(params.scheduler);
-                 work_tile_info = SingleProducerWarp || warp_idx_in_warpgroup == 0 ? scheduler.template get_next_work</*IsProducerWarp=*/true>(params.scheduler, work_tile_info) : scheduler.template get_next_work</*IsProducerWarp=*/false>(params.scheduler, work_tile_info)) {
+                // 查看当前的计算位置是否还有效果
+                work_tile_info.is_valid(params.scheduler);
+                work_tile_info = SingleProducerWarp || warp_idx_in_warpgroup == 0 ? scheduler.template get_next_work</*IsProducerWarp=*/true>(params.scheduler, work_tile_info) : scheduler.template get_next_work</*IsProducerWarp=*/false>(params.scheduler, work_tile_info)) {
 
                 auto scheduler_block_coord = work_tile_info.get_block_coord(params.scheduler);
                 auto block_coord = cute::make_tuple(
-                    get<0>(scheduler_block_coord) * (USE_REUSE_KV ? 2 : 1),
+                    /* block, bidh, bidb, split_idx */
+                    get<0>(scheduler_block_coord),
                     get<1>(scheduler_block_coord),
                     get<2>(scheduler_block_coord),
                     get<3>(scheduler_block_coord));
@@ -384,9 +386,11 @@ public:
                     scheduler.prefetch_next_work(params.scheduler, work_tile_info);
                 };
                 // pipeline_vt won't be used if we don't need to transpose V.
+                // Load Q, K, V
                 mainloop.load(params.mainloop, pipeline_k, pipeline_v, pipeline_vt, smem_pipe_write,
                                          shared_storage, scheduler_prefetch, seqlen_info, block_coord, work_idx);
             }
+            
             mainloop.load_tail(pipeline_k, pipeline_v, pipeline_vt, smem_pipe_write, shared_storage, work_idx);
         } else {  // Consumer
             cutlass::arch::warpgroup_reg_alloc<MmaRegisterRequirement>();
@@ -410,7 +414,7 @@ public:
                  ) {
                 auto scheduler_block_coord = work_tile_info.get_block_coord(params.scheduler);
                 auto block_coord = cute::make_tuple(
-                    get<0>(scheduler_block_coord) * (USE_REUSE_KV ? 2 : 1),
+                    get<0>(scheduler_block_coord),
                     get<1>(scheduler_block_coord),
                     get<2>(scheduler_block_coord),
                     get<3>(scheduler_block_coord));
@@ -470,17 +474,7 @@ public:
                 #endif
                 // Attention output (GEMM-II) accumulator.
                 Tensor tOrO = partition_fragment_C(tiled_mma_pv, select<0, 1>(TileShape_MNK_PV{}));
-#if USE_REUSE_KV
-                flash::Softmax<!LargeHeadDimV ? 2 * (2 * kBlockM / NumMmaThreads) : 2, /*Max_offset=*/!Is_FP8 ? 0 : 8> softmax_reuse(softmax_scale_log2);
-                Tensor tOrO_reuse = partition_fragment_C(tiled_mma_pv, select<0, 1>(TileShape_MNK_PV{}));
-                auto const block_coord_reuse = cute::make_tuple(get<0>(block_coord) + 1, get<1>(block_coord), get<2>(block_coord), get<3>(block_coord));
-                bool const has_reuse_m_block = get<0>(block_coord_reuse) * kBlockM < seqlen_info.seqlen_q;
-                PipelineState smem_pipe_read_reuse = smem_pipe_read;
-#endif
                 bool tile_valid;
-#if USE_REUSE_KV
-                bool tile_valid_reuse;
-#endif
                 // CUSTOM NOTE: static constexpr bool LargeHeadDimV = kHeadDimV > 256;
                 // So for cases that we are interested in, LargeHeadDimV === false
                 if constexpr (!LargeHeadDimV) {
@@ -489,26 +483,9 @@ public:
                         params.mainloop, pipeline_k, pipeline_v, smem_pipe_read,
                         tOrO, softmax, threadIdx.x - MmaThreadOffset, work_idx, seqlen_info, block_coord, shared_storage);
                     #else
-#if USE_REUSE_KV
-                    if (has_reuse_m_block) {
-                        tile_valid = mainloop.template mma<false>(
-                            params.mainloop, pipeline_k, pipeline_v, smem_pipe_read,
-                            tOrO, softmax, threadIdx.x - MmaThreadOffset, work_idx, seqlen_info, block_coord, shared_storage);
-                        smem_pipe_read = smem_pipe_read_reuse;
-                        tile_valid_reuse = mainloop.template mma<true>(
-                            params.mainloop, pipeline_k, pipeline_v, smem_pipe_read,
-                            tOrO_reuse, softmax_reuse, threadIdx.x - MmaThreadOffset, work_idx, seqlen_info, block_coord_reuse, shared_storage);
-                    } else {
-                        tile_valid = mainloop.template mma<true>(
-                            params.mainloop, pipeline_k, pipeline_v, smem_pipe_read,
-                            tOrO, softmax, threadIdx.x - MmaThreadOffset, work_idx, seqlen_info, block_coord, shared_storage);
-                        tile_valid_reuse = false;
-                    }
-#else
                     tile_valid = mainloop.mma(
                         params.mainloop, pipeline_k, pipeline_v, smem_pipe_read,
                         tOrO, softmax, threadIdx.x - MmaThreadOffset, work_idx, seqlen_info, block_coord, shared_storage);
-#endif
                     #endif
                 } else {  // mma_pv might not compile if !LargeHeadDimV
                     if (warp_group_idx == 1) {
@@ -546,16 +523,6 @@ public:
                     // Write 0 to gO and -inf to gLSE.
                     epilogue.store_zero(params.epilogue, threadIdx.x - MmaThreadOffset, block_coord);
                 }
-#if USE_REUSE_KV
-                if (has_reuse_m_block) {
-                    if (tile_valid_reuse) {
-                        epilogue.store(params.epilogue, tOrO_reuse, softmax_reuse.row_sum, shared_storage, tiled_mma_pv,
-                                       threadIdx.x - MmaThreadOffset, block_coord_reuse);
-                    } else {
-                        epilogue.store_zero(params.epilogue, threadIdx.x - MmaThreadOffset, block_coord_reuse);
-                    }
-                }
-#endif
             }
             epilogue.store_tail();
         }
