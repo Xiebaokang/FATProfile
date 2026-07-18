@@ -1,0 +1,80 @@
+{
+  "shape": {
+    "B": 1,
+    "H": 16,
+    "S": 32768,
+    "D": 64
+  },
+  "dtype": "fp16",
+  "causal": false,
+  "requested_rank": 15,
+  "benchmark_timeout_seconds": 120.0,
+  "result_tag": null,
+  "total_configs": 3,
+  "completed": 3,
+  "successful": 3,
+  "failed": 0,
+  "top_results": [
+    {
+      "config": {
+        "kBlockM": 192,
+        "kBlockN": 128,
+        "kStage": 2,
+        "producer_reg_dealloc": 32,
+        "consumer_reg_alloc": 160,
+        "p_smem_k_tiles": 2,
+        "q_reg_k_tiles": 3,
+        "num_consumer": 3,
+        "smem_size": 87040,
+        "estimated_consumer_regs_per_thread": 141,
+        "estimated_consumer_fragment_regs": 54144,
+        "allocated_registers_per_cta": 65536
+      },
+      "executable": "test_b1_h16_s32768_d64_fp16_noncausal_bm192_bn128_st2_prd32_cra160_p2_q3_nc3_rl10",
+      "time_ms": 13.214,
+      "tflops": 332.83,
+      "rank": 1
+    },
+    {
+      "config": {
+        "kBlockM": 192,
+        "kBlockN": 128,
+        "kStage": 3,
+        "producer_reg_dealloc": 32,
+        "consumer_reg_alloc": 160,
+        "p_smem_k_tiles": 2,
+        "q_reg_k_tiles": 3,
+        "num_consumer": 3,
+        "smem_size": 119808,
+        "estimated_consumer_regs_per_thread": 141,
+        "estimated_consumer_fragment_regs": 54144,
+        "allocated_registers_per_cta": 65536
+      },
+      "executable": "test_b1_h16_s32768_d64_fp16_noncausal_bm192_bn128_st3_prd32_cra160_p2_q3_nc3_rl10",
+      "time_ms": 13.254,
+      "tflops": 331.82,
+      "rank": 2
+    },
+    {
+      "config": {
+        "kBlockM": 192,
+        "kBlockN": 128,
+        "kStage": 2,
+        "producer_reg_dealloc": 32,
+        "consumer_reg_alloc": 160,
+        "p_smem_k_tiles": 4,
+        "q_reg_k_tiles": 4,
+        "num_consumer": 3,
+        "smem_size": 93184,
+        "estimated_consumer_regs_per_thread": 137,
+        "estimated_consumer_fragment_regs": 52608,
+        "allocated_registers_per_cta": 65536
+      },
+      "executable": "test_b1_h16_s32768_d64_fp16_noncausal_bm192_bn128_st2_prd32_cra160_p4_q4_nc3_rl10",
+      "time_ms": 13.277,
+      "tflops": 331.26,
+      "rank": 3
+    }
+  ],
+  "failed_results": []
+}

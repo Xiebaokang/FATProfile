@@ -1,0 +1,60 @@
+{
+  "shape": {
+    "B": 1,
+    "H": 16,
+    "S": 32768,
+    "D": 64
+  },
+  "dtype": "fp16",
+  "causal": false,
+  "requested_rank": 15,
+  "benchmark_timeout_seconds": 120.0,
+  "result_tag": null,
+  "total_configs": 2,
+  "completed": 2,
+  "successful": 2,
+  "failed": 0,
+  "top_results": [
+    {
+      "config": {
+        "kBlockM": 192,
+        "kBlockN": 192,
+        "kStage": 2,
+        "producer_reg_dealloc": 32,
+        "consumer_reg_alloc": 160,
+        "p_smem_k_tiles": 12,
+        "q_reg_k_tiles": 0,
+        "num_consumer": 3,
+        "smem_size": 199680,
+        "estimated_consumer_regs_per_thread": 137,
+        "estimated_consumer_fragment_regs": 52608,
+        "allocated_registers_per_cta": 65536
+      },
+      "executable": "test_b1_h16_s32768_d64_fp16_noncausal_bm192_bn192_st2_prd32_cra160_p12_q0_nc3_rl10",
+      "time_ms": 13.779,
+      "tflops": 319.19,
+      "rank": 1
+    },
+    {
+      "config": {
+        "kBlockM": 192,
+        "kBlockN": 192,
+        "kStage": 1,
+        "producer_reg_dealloc": 32,
+        "consumer_reg_alloc": 160,
+        "p_smem_k_tiles": 12,
+        "q_reg_k_tiles": 0,
+        "num_consumer": 3,
+        "smem_size": 150528,
+        "estimated_consumer_regs_per_thread": 137,
+        "estimated_consumer_fragment_regs": 52608,
+        "allocated_registers_per_cta": 65536
+      },
+      "executable": "test_b1_h16_s32768_d64_fp16_noncausal_bm192_bn192_st1_prd32_cra160_p12_q0_nc3_rl10",
+      "time_ms": 15.301,
+      "tflops": 287.43,
+      "rank": 2
+    }
+  ],
+  "failed_results": []
+}

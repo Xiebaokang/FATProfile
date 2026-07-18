@@ -1,0 +1,23 @@
+
+# Consider dependencies only in project.
+set(CMAKE_DEPENDS_IN_PROJECT_ONLY OFF)
+
+# The set of languages for which implicit dependencies are needed:
+set(CMAKE_DEPENDS_LANGUAGES
+  )
+
+# The set of dependency files which are needed:
+set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/new_tune/src/test_b1_h16_s32768_d64_fp8_causal/cuda_source/bm128_bn128_st2_prd24_cra240_p1_q1_nc2_sb0.cu" "CMakeFiles/bm128_bn128_st2_prd24_cra240_p1_q1_nc2_sb0.dir/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/new_tune/src/test_b1_h16_s32768_d64_fp8_causal/cuda_source/bm128_bn128_st2_prd24_cra240_p1_q1_nc2_sb0.cu.o" "gcc" "CMakeFiles/bm128_bn128_st2_prd24_cra240_p1_q1_nc2_sb0.dir/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/new_tune/src/test_b1_h16_s32768_d64_fp8_causal/cuda_source/bm128_bn128_st2_prd24_cra240_p1_q1_nc2_sb0.cu.o.d"
+  )
+
+# Targets to which this target links which contain Fortran sources.
+set(CMAKE_Fortran_TARGET_LINKED_INFO_FILES
+  )
+
+# Targets to which this target links which contain Fortran sources.
+set(CMAKE_Fortran_TARGET_FORWARD_LINKED_INFO_FILES
+  )
+
+# Fortran module output directory.
+set(CMAKE_Fortran_TARGET_MODULE_DIR "")

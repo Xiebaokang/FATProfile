@@ -1,0 +1,13 @@
+cmake_minimum_required(VERSION 3.26)
+set(PROJ_NAME new_tune_fa3_tests)
+set(CMAKE_UTILS_DIR "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/cmake")
+include(${CMAKE_UTILS_DIR}/cmakePrologue.cmake)
+include(${CMAKE_UTILS_DIR}/utilFuncs.cmake)
+project(${PROJ_NAME} LANGUAGES CXX CUDA)
+include(${CMAKE_UTILS_DIR}/flashVenv.cmake)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/new_tune/src/test_b1_h16_s32768_d64_fp8_causal/build/rl5/bin")
+
+add_single_source_executable("/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/new_tune/src/test_b1_h16_s32768_d64_fp8_causal/cuda_source/bm128_bn128_st2_prd24_cra240_p1_q1_nc2_sb0.cu" 5)
+add_single_source_executable("/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/new_tune/src/test_b1_h16_s32768_d64_fp8_causal/cuda_source/bm128_bn128_st2_prd24_cra240_p0_q1_nc2_sb0.cu" 5)
+add_single_source_executable("/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/new_tune/src/test_b1_h16_s32768_d64_fp8_causal/cuda_source/bm128_bn128_st2_prd24_cra240_p1_q0_nc2_sb0.cu" 5)
+add_single_source_executable("/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/new_tune/src/test_b1_h16_s32768_d64_fp8_causal/cuda_source/bm128_bn128_st2_prd24_cra240_p0_q0_nc2_sb0.cu" 5)

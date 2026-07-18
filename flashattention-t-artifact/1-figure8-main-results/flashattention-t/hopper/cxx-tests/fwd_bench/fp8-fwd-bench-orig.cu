@@ -160,6 +160,9 @@ float bench_fwd_single_dispatch(
   if (head_dim == 128) {
     return bench_fwd_single<128>(batch_size, num_heads, seqlen, is_causal, iter, warmup);
   }
+  if (head_dim == 256) {
+    return bench_fwd_single<256>(batch_size, num_heads, seqlen, is_causal, iter, warmup);
+  }
   throw std::runtime_error("single-shape mode supports head_dim 64 or 128");
 }
 

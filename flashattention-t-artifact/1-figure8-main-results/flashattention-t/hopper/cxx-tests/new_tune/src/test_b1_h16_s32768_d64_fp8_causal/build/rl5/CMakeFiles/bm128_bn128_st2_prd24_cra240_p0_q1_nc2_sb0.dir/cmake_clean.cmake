@@ -1,0 +1,11 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/bm128_bn128_st2_prd24_cra240_p0_q1_nc2_sb0.dir/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/new_tune/src/test_b1_h16_s32768_d64_fp8_causal/cuda_source/bm128_bn128_st2_prd24_cra240_p0_q1_nc2_sb0.cu.o"
+  "CMakeFiles/bm128_bn128_st2_prd24_cra240_p0_q1_nc2_sb0.dir/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/new_tune/src/test_b1_h16_s32768_d64_fp8_causal/cuda_source/bm128_bn128_st2_prd24_cra240_p0_q1_nc2_sb0.cu.o.d"
+  "bin/bm128_bn128_st2_prd24_cra240_p0_q1_nc2_sb0"
+  "bin/bm128_bn128_st2_prd24_cra240_p0_q1_nc2_sb0.pdb"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CUDA)
+  include(CMakeFiles/bm128_bn128_st2_prd24_cra240_p0_q1_nc2_sb0.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

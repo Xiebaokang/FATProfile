@@ -305,6 +305,158 @@ CUTLASS_DEVICE void gemm(TiledMma& tiled_mma, Tensor0 const& tCrA, Tensor1 const
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// QK with a K dimension split between up to three SS GMMA descriptors and
+// one RS fragment.  All partial products accumulate into the same C fragment
+// and are committed as one warpgroup batch.
+#if USE_MIX_WGMMA
+template <bool HasQ128, bool HasQ64, bool HasQ32, bool HasQReg,
+          bool zero_init=false, int wg_wait=0,
+          typename TiledMmaSS, typename TiledMmaRS,
+          typename TensorQ128, typename TensorQ64, typename TensorQ32,
+          typename TensorQReg, typename TensorK, typename TensorC>
+CUTLASS_DEVICE void gemmQK(
+        TiledMmaSS& tiled_mma_ss, TiledMmaRS& tiled_mma_rs,
+        TensorQ128 const& tSsQ128, TensorQ64 const& tSsQ64,
+        TensorQ32 const& tSsQ32, TensorQReg const& tRrQ,
+        TensorK const& tSsK, TensorC& tCrC) {
+    static_assert(HasQ128 || HasQ64 || HasQ32 || HasQReg,
+                  "gemmQK requires at least one Q K-tile");
+    constexpr int Q128KIters = HasQ128 ? CUTE_STATIC_V(size<2>(tSsQ128)) : 0;
+    constexpr int Q64KIters = HasQ64 ? CUTE_STATIC_V(size<2>(tSsQ64)) : 0;
+    constexpr int Q32KIters = HasQ32 ? CUTE_STATIC_V(size<2>(tSsQ32)) : 0;
+    constexpr int QRegKIters = HasQReg ? CUTE_STATIC_V(size<2>(tRrQ)) : 0;
+    static_assert(Q128KIters + Q64KIters + Q32KIters + QRegKIters
+                      == CUTE_STATIC_V(size<2>(tSsK)),
+                  "mixed Q fragments must cover the complete QK K dimension");
+
+    if constexpr (HasQReg) { warpgroup_fence_operand(const_cast<TensorQReg&>(tRrQ)); }
+    warpgroup_fence_operand(tCrC);
+    warpgroup_arrive();
+
+    auto set_scale = [&](GMMA::ScaleOut scale) {
+        tiled_mma_ss.accumulate_ = scale;
+        tiled_mma_rs.accumulate_ = scale;
+    };
+    set_scale(zero_init ? GMMA::ScaleOut::Zero : GMMA::ScaleOut::One);
+
+    if constexpr (HasQ128) {
+        CUTLASS_PRAGMA_UNROLL
+        for (int k = 0; k < Q128KIters; ++k) {
+            cute::gemm(tiled_mma_ss, tSsQ128(_, _, k), tSsK(_, _, k), tCrC);
+            set_scale(GMMA::ScaleOut::One);
+        }
+    }
+    if constexpr (HasQ64) {
+        CUTLASS_PRAGMA_UNROLL
+        for (int k = 0; k < Q64KIters; ++k) {
+            cute::gemm(tiled_mma_ss, tSsQ64(_, _, k),
+                       tSsK(_, _, Q128KIters + k), tCrC);
+            set_scale(GMMA::ScaleOut::One);
+        }
+    }
+    if constexpr (HasQ32) {
+        CUTLASS_PRAGMA_UNROLL
+        for (int k = 0; k < Q32KIters; ++k) {
+            cute::gemm(tiled_mma_ss, tSsQ32(_, _, k),
+                       tSsK(_, _, Q128KIters + Q64KIters + k), tCrC);
+            set_scale(GMMA::ScaleOut::One);
+        }
+    }
+    if constexpr (HasQReg) {
+        CUTLASS_PRAGMA_UNROLL
+        for (int k = 0; k < QRegKIters; ++k) {
+            cute::gemm(tiled_mma_rs, tRrQ(_, _, k),
+                       tSsK(_, _, Q128KIters + Q64KIters + Q32KIters + k), tCrC);
+            set_scale(GMMA::ScaleOut::One);
+        }
+    }
+
+    warpgroup_commit_batch();
+    if constexpr (wg_wait >= 0) { warpgroup_wait<wg_wait>(); }
+    warpgroup_fence_operand(tCrC);
+    if constexpr (HasQReg) { warpgroup_fence_operand(const_cast<TensorQReg&>(tRrQ)); }
+}
+
+// PV with the leading K tiles of P in one or more SMEM descriptors and the
+// remaining K tiles in registers.  V stays in its independently-swizzled SMEM
+// layout; its K iterator is advanced to match each P region.
+template <bool HasP128, bool HasP64, bool HasP32, bool HasPReg,
+          bool PRegIsCompact,
+          bool zero_init=false, int wg_wait=0,
+          typename TiledMmaSS, typename TiledMmaRS,
+          typename TensorP128, typename TensorP64, typename TensorP32,
+          typename TensorPReg, typename TensorV, typename TensorC>
+CUTLASS_DEVICE void gemmPV(
+        TiledMmaSS& tiled_mma_ss, TiledMmaRS& tiled_mma_rs,
+        TensorP128 const& tSsP128, TensorP64 const& tSsP64,
+        TensorP32 const& tSsP32, TensorPReg const& tRrP,
+        TensorV const& tSsV, TensorC& tCrC) {
+    static_assert(HasP128 || HasP64 || HasP32 || HasPReg,
+                  "gemmPV requires at least one P K-tile");
+    constexpr int P128KIters = HasP128 ? CUTE_STATIC_V(size<2>(tSsP128)) : 0;
+    constexpr int P64KIters = HasP64 ? CUTE_STATIC_V(size<2>(tSsP64)) : 0;
+    constexpr int P32KIters = HasP32 ? CUTE_STATIC_V(size<2>(tSsP32)) : 0;
+    constexpr int PInputKIters = CUTE_STATIC_V(size<2>(tRrP));
+    constexpr int PSmemKIters = P128KIters + P64KIters + P32KIters;
+    constexpr int PRegKIters = HasPReg
+        ? (PRegIsCompact ? PInputKIters : PInputKIters - PSmemKIters) : 0;
+    static_assert(PRegKIters >= 0);
+    static_assert(P128KIters + P64KIters + P32KIters + PRegKIters
+                      == CUTE_STATIC_V(size<2>(tSsV)),
+                  "mixed P fragments must cover the complete PV K dimension");
+
+    if constexpr (HasPReg) { warpgroup_fence_operand(const_cast<TensorPReg&>(tRrP)); }
+    warpgroup_fence_operand(tCrC);
+    warpgroup_arrive();
+
+    auto set_scale = [&](GMMA::ScaleOut scale) {
+        tiled_mma_ss.accumulate_ = scale;
+        tiled_mma_rs.accumulate_ = scale;
+    };
+    set_scale(zero_init ? GMMA::ScaleOut::Zero : GMMA::ScaleOut::One);
+
+    if constexpr (HasP128) {
+        CUTLASS_PRAGMA_UNROLL
+        for (int k = 0; k < P128KIters; ++k) {
+            cute::gemm(tiled_mma_ss, tSsP128(_, _, k), tSsV(_, _, k), tCrC);
+            set_scale(GMMA::ScaleOut::One);
+        }
+    }
+    if constexpr (HasP64) {
+        CUTLASS_PRAGMA_UNROLL
+        for (int k = 0; k < P64KIters; ++k) {
+            cute::gemm(tiled_mma_ss, tSsP64(_, _, k),
+                       tSsV(_, _, P128KIters + k), tCrC);
+            set_scale(GMMA::ScaleOut::One);
+        }
+    }
+    if constexpr (HasP32) {
+        CUTLASS_PRAGMA_UNROLL
+        for (int k = 0; k < P32KIters; ++k) {
+            cute::gemm(tiled_mma_ss, tSsP32(_, _, k),
+                       tSsV(_, _, P128KIters + P64KIters + k), tCrC);
+            set_scale(GMMA::ScaleOut::One);
+        }
+    }
+    if constexpr (HasPReg) {
+        CUTLASS_PRAGMA_UNROLL
+        for (int k = 0; k < PRegKIters; ++k) {
+            constexpr int PRegInputOffset = PRegIsCompact ? 0 : PSmemKIters;
+            cute::gemm(tiled_mma_rs, tRrP(_, _, PRegInputOffset + k),
+                       tSsV(_, _, PSmemKIters + k), tCrC);
+            set_scale(GMMA::ScaleOut::One);
+        }
+    }
+
+    warpgroup_commit_batch();
+    if constexpr (wg_wait >= 0) { warpgroup_wait<wg_wait>(); }
+    warpgroup_fence_operand(tCrC);
+    if constexpr (HasPReg) { warpgroup_fence_operand(const_cast<TensorPReg&>(tRrP)); }
+}
+#endif
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 template<bool A_in_regs=false, bool B_in_regs=false, bool SwapAB=false,
          typename Tensor0, typename Tensor1,
          typename Tensor2, typename Tensor3, typename Tensor4,

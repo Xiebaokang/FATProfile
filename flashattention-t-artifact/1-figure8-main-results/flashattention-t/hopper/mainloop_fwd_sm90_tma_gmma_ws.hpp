@@ -37,10 +37,16 @@ namespace flash {
 
 using namespace cute;
 
+#if USE_MIX_WGMMA
+template <auto Config, int Stages, class ClusterShape_, class TileShape_MNK_, int kHeadDimV, class Element_, class ElementAccum_, class ArchTag_,
+        bool Is_causal_, bool Is_local_, bool Has_softcap_, bool Varlen_, bool PagedKVNonTMA_, bool AppendKV_, bool HasQv_,
+        bool MmaPV_is_RS, bool IntraWGOverlap, bool PackGQA_, bool Split_, bool V_colmajor_>
+#else
 template <int Stages, class ClusterShape_, class TileShape_MNK_, int kHeadDimV, class Element_, class ElementAccum_, class ArchTag_,
         bool Is_causal_, bool Is_local_, bool Has_softcap_, bool Varlen_, bool PagedKVNonTMA_, bool AppendKV_, bool HasQv_,
         bool MmaPV_is_RS, bool IntraWGOverlap, bool PackGQA_, bool Split_, bool V_colmajor_,
         int ProducerRegDealloc_ = 0, int ConsumerRegAlloc_ = 0>
+#endif
 struct CollectiveMainloopFwdSm90 {
 
     static constexpr int kStages = Stages;
@@ -79,6 +85,105 @@ struct CollectiveMainloopFwdSm90 {
     static constexpr int kBlockN = get<1>(TileShape_MNK{});
     static constexpr int kHeadDim = get<2>(TileShape_MNK{});
 
+#if USE_MIX_WGMMA
+    static constexpr uint32_t LoadRegisterRequirement = Config.producer_reg_dealloc;
+    static constexpr uint32_t MmaRegisterRequirement = Config.consumer_reg_alloc;
+
+    static_assert(LoadRegisterRequirement >= 24 && LoadRegisterRequirement <= 256 &&
+                  LoadRegisterRequirement % 8 == 0,
+                  "producer_reg_dealloc must be an 8-register-aligned value in [24, 256]");
+    static_assert(MmaRegisterRequirement >= 24 && MmaRegisterRequirement <= 256 &&
+                  MmaRegisterRequirement % 8 == 0,
+                  "consumer_reg_alloc must be an 8-register-aligned value in [24, 256]");
+    static_assert(Config.use_scheduler_barrier == 0 || Config.use_scheduler_barrier == 1,
+                  "use_scheduler_barrier must be 0 or 1");
+    static_assert(Is_FP8 || cute::is_same_v<Element, cutlass::half_t>,
+                  "USE_MIX_WGMMA only supports FP8 and FP16");
+    static_assert(!LargeHeadDimV,
+                  "USE_MIX_WGMMA does not support head_dim_v greater than 256");
+    static_assert(!Is_local && !Has_softcap && !PagedKVNonTMA &&
+                  !AppendKV && !HasQv && !PackGQA && !Split,
+                  "USE_MIX_WGMMA only supports the plain causal/non-causal path");
+    static constexpr int MmaK = Is_FP8 ? 32 : 16;
+    static constexpr int QRegKTiles = Config.q_reg_k_tiles;
+    static constexpr int QTotalKTiles = kHeadDim / MmaK;
+    static constexpr int QSmemKTiles = QTotalKTiles - QRegKTiles;
+    static constexpr int QRegCols = QRegKTiles * MmaK;
+    static constexpr int QSmemCols = QSmemKTiles * MmaK;
+    static_assert(kHeadDim % MmaK == 0, "Q head dimension must be MMA-K aligned");
+    static_assert(QRegKTiles >= 0 && QRegKTiles <= QTotalKTiles,
+                  "q_reg_k_tiles must be in [0, q_total_k_tiles]");
+
+    // Decompose the SMEM part greedily into SW128, SW64 and SW32 regions.
+    // Each region owns a separate TMA descriptor and starts at an aligned
+    // offset in the same compact SMEM Q allocation.
+    static constexpr int QKTilesPerSW128 = 128 / (sizeof(Element) * MmaK);
+    static constexpr int QKTilesPerSW64 = 64 / (sizeof(Element) * MmaK);
+    static constexpr int QKTilesPerSW32 = 32 / (sizeof(Element) * MmaK);
+    static_assert(QKTilesPerSW128 > 0 && QKTilesPerSW64 > 0 && QKTilesPerSW32 > 0);
+    static constexpr int Q128KTiles = QSmemKTiles / QKTilesPerSW128 * QKTilesPerSW128;
+    static constexpr int QAfter128KTiles = QSmemKTiles - Q128KTiles;
+    static constexpr int Q64KTiles = QAfter128KTiles / QKTilesPerSW64 * QKTilesPerSW64;
+    static constexpr int Q32KTiles = QAfter128KTiles - Q64KTiles;
+    static_assert(Q32KTiles == 0 || Q32KTiles == QKTilesPerSW32,
+                  "Q SMEM remainder cannot be represented by SW32");
+    static constexpr bool HasQ128 = Q128KTiles > 0;
+    static constexpr bool HasQ64 = Q64KTiles > 0;
+    static constexpr bool HasQ32 = Q32KTiles > 0;
+    static constexpr bool HasQReg = QRegKTiles > 0;
+    static constexpr bool HasQSmem = QSmemKTiles > 0;
+    static constexpr int Q128Cols = Q128KTiles * MmaK;
+    static constexpr int Q64Cols = Q64KTiles * MmaK;
+    static constexpr int Q32Cols = Q32KTiles * MmaK;
+    static constexpr int Q128ColsSafe = HasQ128 ? Q128Cols : 128 / sizeof(Element);
+    static constexpr int Q64ColsSafe = HasQ64 ? Q64Cols : 64 / sizeof(Element);
+    static constexpr int Q32ColsSafe = HasQ32 ? Q32Cols : 32 / sizeof(Element);
+    static constexpr int QRegColsSafe = HasQReg ? QRegCols : MmaK;
+
+    static constexpr int PTotalKTiles = kBlockN / MmaK;
+    static constexpr int PSmemKTiles = Config.p_smem_k_tiles;
+    static constexpr int PRegKTiles = PTotalKTiles - PSmemKTiles;
+    static constexpr int PSmemCols = PSmemKTiles * MmaK;
+    static constexpr int PRegCols = PRegKTiles * MmaK;
+    static_assert(kBlockN % MmaK == 0, "P K dimension must be MMA-K aligned");
+    static_assert(PSmemKTiles >= 0 && PSmemKTiles <= PTotalKTiles,
+                  "p_smem_k_tiles must be in [0, p_total_k_tiles]");
+    // A 3-tile prefix, for example, cannot be represented by one 96B GMMA
+    // swizzle.  Split it into an SW64 region and an SW32 region.  Larger
+    // prefixes are decomposed greedily into SW128, SW64 and SW32 regions.
+    static constexpr int PKTilesPerSW128 = 128 / (sizeof(Element) * MmaK);
+    static constexpr int PKTilesPerSW64 = 64 / (sizeof(Element) * MmaK);
+    static constexpr int PKTilesPerSW32 = 32 / (sizeof(Element) * MmaK);
+    static constexpr int P128KTiles = PSmemKTiles / PKTilesPerSW128 * PKTilesPerSW128;
+    static constexpr int PAfter128KTiles = PSmemKTiles - P128KTiles;
+    static constexpr int P64KTiles = PAfter128KTiles / PKTilesPerSW64 * PKTilesPerSW64;
+    static constexpr int P32KTiles = PAfter128KTiles - P64KTiles;
+    static_assert(P32KTiles == 0 || P32KTiles == PKTilesPerSW32,
+                  "P SMEM remainder cannot be represented by SW32");
+    static constexpr bool HasP128 = P128KTiles > 0;
+    static constexpr bool HasP64 = P64KTiles > 0;
+    static constexpr bool HasP32 = P32KTiles > 0;
+    static constexpr bool HasPSmem = PSmemKTiles > 0;
+    static constexpr bool HasPReg = PRegKTiles > 0;
+    static constexpr int P128Cols = P128KTiles * MmaK;
+    static constexpr int P64Cols = P64KTiles * MmaK;
+    static constexpr int P32Cols = P32KTiles * MmaK;
+    static constexpr int P128ColsSafe = HasP128 ? P128Cols : 128 / sizeof(Element);
+    static constexpr int P64ColsSafe = HasP64 ? P64Cols : 64 / sizeof(Element);
+    static constexpr int P32ColsSafe = HasP32 ? P32Cols : 32 / sizeof(Element);
+    static constexpr int PRegColsSafe = HasPReg ? PRegCols : MmaK;
+#endif
+
+#if !USE_MIX_WGMMA
+    static constexpr bool HasQSmem = true;
+#endif
+
+#if USE_MIX_WGMMA
+    static constexpr bool StorePInSmem = HasPSmem;
+#else
+    static constexpr bool StorePInSmem = !MmaPV_is_RS;
+#endif
+
     using SeqlenInfo_t = flash::SeqlenInfoQKNewK<Varlen, AppendKV>;
     using BlockMN_t = flash::BlockMN<SeqlenInfo_t, kBlockM, kBlockN, Is_causal, Is_local, PackGQA, Split>;
 
@@ -94,7 +199,11 @@ struct CollectiveMainloopFwdSm90 {
     static_assert(!(!MmaPV_is_RS && Transpose_V), "MmaPV must be RS if Transpose_V");
 
     // Slightly faster in this case to have WG1 use RS instead of SS to avoid waiting for the P smem write
+#if USE_MIX_WGMMA
+    static constexpr bool MmaPV_use_RS_WG1 = false;
+#else
     static constexpr bool MmaPV_use_RS_WG1 = !MmaPV_is_RS && kHeadDim == 64 && kHeadDimV == 512;
+#endif
 
     using AtomLayoutQK = Layout<Shape<Int<kBlockM / 64>, _1, _1>>;
     using TiledMmaQK = decltype(cute::make_tiled_mma(
@@ -104,6 +213,11 @@ struct CollectiveMainloopFwdSm90 {
             decltype(cute::GMMA::rs_op_selector<Element, Element, ElementAccum, TileShape_MNK>())
         >{},
         AtomLayoutQK{}));
+#if USE_MIX_WGMMA
+    using TiledMmaQKRS = decltype(cute::make_tiled_mma(
+        cute::GMMA::rs_op_selector<Element, Element, ElementAccum, TileShape_MNK>(),
+        AtomLayoutQK{}));
+#endif
     using AtomLayoutPV = std::conditional_t<
         !LargeHeadDimV,
         AtomLayoutQK,
@@ -111,13 +225,23 @@ struct CollectiveMainloopFwdSm90 {
     >;
     using TiledMmaPV = decltype(cute::make_tiled_mma(
         std::conditional_t<
+#if USE_MIX_WGMMA
+            false,
+#else
             !MmaPV_is_RS,
+#endif
             decltype(cute::GMMA::ss_op_selector<Element, Element, ElementAccum,
                      TileShape_MNK_PV, GMMA::Major::K, MmaMajorV>()),
             decltype(cute::GMMA::rs_op_selector<Element, Element, ElementAccum,
                      TileShape_MNK_PV, GMMA::Major::K, MmaMajorV>())
         >{},
         AtomLayoutPV{}));
+#if USE_MIX_WGMMA
+    using TiledMmaPVSS = decltype(cute::make_tiled_mma(
+        cute::GMMA::ss_op_selector<Element, Element, ElementAccum,
+            TileShape_MNK_PV, GMMA::Major::K, MmaMajorV>(),
+        AtomLayoutPV{}));
+#endif
     using TiledMmaQV = decltype(cute::make_tiled_mma(
         cute::GMMA::ss_op_selector<Element, Element, ElementAccum, TileShape_MNK_QV>(),
         AtomLayoutQK{}));
@@ -133,11 +257,31 @@ struct CollectiveMainloopFwdSm90 {
     static_assert(NumMmaThreadsQK % cutlass::NumThreadsPerWarpGroup == 0);
     static_assert(NumMmaThreads % cutlass::NumThreadsPerWarpGroup == 0);
     static constexpr int NumMmaWarpGroups = NumMmaThreads / cutlass::NumThreadsPerWarpGroup;
-    static_assert(NumMmaWarpGroups == 1 || NumMmaWarpGroups == 2 || NumMmaWarpGroups == 3);
+#if USE_MIX_WGMMA
+    static_assert(NumMmaWarpGroups >= 1 && NumMmaWarpGroups <= 4);
+#else
+    static_assert(NumMmaWarpGroups >= 1 && NumMmaWarpGroups <= 3);
+#endif
 
     using SmemLayoutAtomQ = decltype(cutlass::gemm::collective::detail::ss_smem_selector<GMMA::Major::K, Element,
         decltype(cute::get<0>(TileShape_MNK{})), decltype(cute::get<2>(TileShape_MNK{}))>());
     using SmemLayoutQ = decltype(tile_to_shape(SmemLayoutAtomQ{}, select<0, 2>(TileShape_MNK{})));
+
+#if USE_MIX_WGMMA
+    template <int KCols>
+    using SmemLayoutAtomQPart = decltype(cutlass::gemm::collective::detail::ss_smem_selector<
+        GMMA::Major::K, Element, Int<kBlockM>, Int<KCols>>());
+    template <int KCols>
+    using SmemLayoutQPart = decltype(tile_to_shape(
+        SmemLayoutAtomQPart<KCols>{}, Shape<Int<kBlockM>, Int<KCols>>{}));
+    using SmemLayoutQ128 = SmemLayoutQPart<Q128ColsSafe>;
+    using SmemLayoutQ64 = SmemLayoutQPart<Q64ColsSafe>;
+    using SmemLayoutQ32 = SmemLayoutQPart<Q32ColsSafe>;
+    static constexpr int Q128SmemOffset = 0;
+    static constexpr int Q64SmemOffset = HasQ128 ? cute::cosize_v<SmemLayoutQ128> : 0;
+    static constexpr int Q32SmemOffset = Q64SmemOffset + (HasQ64 ? cute::cosize_v<SmemLayoutQ64> : 0);
+    static constexpr int QSmemElements = kBlockM * QSmemCols;
+#endif
 
     using SmemLayoutAtomK = decltype(cutlass::gemm::collective::detail::ss_smem_selector<GMMA::Major::K, Element,
         decltype(cute::get<1>(TileShape_MNK{})), decltype(cute::get<2>(TileShape_MNK{}))>());
@@ -179,11 +323,47 @@ struct CollectiveMainloopFwdSm90 {
     using SmemLayoutAtomP = decltype(cutlass::gemm::collective::detail::ss_smem_selector<GMMA::Major::K, Element,
         decltype(cute::get<0>(TileShape_MNK{})), decltype(cute::get<1>(TileShape_MNK{}))>());
     using SmemLayoutP = decltype(tile_to_shape(SmemLayoutAtomP{}, select<0, 1>(TileShape_MNK{})));
+#if USE_MIX_WGMMA
+    template <int KCols>
+    using SmemLayoutAtomPPart = decltype(cutlass::gemm::collective::detail::ss_smem_selector<
+        GMMA::Major::K, Element, Int<kBlockM>, Int<KCols>>());
+    template <int KCols>
+    using SmemLayoutPPart = decltype(tile_to_shape(
+        SmemLayoutAtomPPart<KCols>{}, Shape<Int<kBlockM>, Int<KCols>>{}));
+    using SmemLayoutP128 = SmemLayoutPPart<P128ColsSafe>;
+    using SmemLayoutP64 = SmemLayoutPPart<P64ColsSafe>;
+    using SmemLayoutP32 = SmemLayoutPPart<P32ColsSafe>;
+    static constexpr int P128SmemOffset = 0;
+    static constexpr int P64SmemOffset = HasP128 ? cute::cosize_v<SmemLayoutP128> : 0;
+    static constexpr int P32SmemOffset = P64SmemOffset + (HasP64 ? cute::cosize_v<SmemLayoutP64> : 0);
+    static constexpr int PSmemElements = kBlockM * PSmemCols;
+#endif
 
     // Only for LargeHeadDimV where WG0 sends WG1 the scales
     using SmemLayoutScale = cute::Layout<cute::Shape<Int<kBlockM>, Int<kStages>>>;
 
     using SmemCopyAtomP = Copy_Atom<cute::SM90_U32x4_STSM_N, Element>;
+#if USE_MIX_WGMMA
+    // STSM is a b16 matrix store.  An FP8 prefix therefore presents pairs of
+    // P values to the copy atom, while FP16/BF16 already have one value per
+    // b16 cell.  Keep this packed view local to the mixed-prefix path so the
+    // original full-P path remains unchanged.
+    using SmemCopyValuePPart = std::conditional_t<Is_FP8, uint16_t, Element>;
+    using SmemCopyAtomPPart = Copy_Atom<cute::SM90_U32x4_STSM_N, SmemCopyValuePPart>;
+    template <int NCols>
+    using TileShapeQKPart = Shape<Int<kBlockM>, Int<NCols>, Int<kHeadDim>>;
+    template <int NCols>
+    using TiledMmaQKPart = decltype(cute::make_tiled_mma(
+        cute::GMMA::ss_op_selector<Element, Element, ElementAccum,
+            TileShapeQKPart<NCols>>(),
+        AtomLayoutQK{}));
+    template <int NCols>
+    using SmemTiledCopyPPart = decltype(make_tiled_copy_C(
+        SmemCopyAtomPPart{}, TiledMmaQKPart<NCols>{}));
+    using SmemTiledCopyP128 = SmemTiledCopyPPart<P128ColsSafe>;
+    using SmemTiledCopyP64 = SmemTiledCopyPPart<P64ColsSafe>;
+    using SmemTiledCopyP32 = SmemTiledCopyPPart<P32ColsSafe>;
+#endif
 
     // Use LDSM.T and STSM to transpose V in the case of FP8 and V being row-major.
     // For FP16/BF16 we don't do any transposing.
@@ -263,6 +443,23 @@ struct CollectiveMainloopFwdSm90 {
         TileShape_MNK{},
         ClusterShape{}));
 
+#if USE_MIX_WGMMA
+    template <int KCols, class SmemLayout>
+    using TMA_Q_Part = decltype(make_tma_copy_A_sm90(
+        GmemTiledCopyQ{},
+        make_tensor(make_gmem_ptr(static_cast<Element const*>(nullptr)), ShapeQKV{}, StrideQK{}),
+        SmemLayout{},
+        Shape<Int<kBlockM>, Int<kBlockN>, Int<KCols>>{},
+        ClusterShape{}));
+    using TMA_Q128 = TMA_Q_Part<Q128ColsSafe, SmemLayoutQ128>;
+    using TMA_Q64 = TMA_Q_Part<Q64ColsSafe, SmemLayoutQ64>;
+    using TMA_Q32 = TMA_Q_Part<Q32ColsSafe, SmemLayoutQ32>;
+    using TMA_QActive = std::conditional_t<!HasQReg, TMA_Q, std::nullptr_t>;
+    using TMA_Q128Active = std::conditional_t<HasQ128, TMA_Q128, std::nullptr_t>;
+    using TMA_Q64Active = std::conditional_t<HasQ64, TMA_Q64, std::nullptr_t>;
+    using TMA_Q32Active = std::conditional_t<HasQ32, TMA_Q32, std::nullptr_t>;
+#endif
+
     using TMA_K = decltype(make_tma_copy_B_sm90(
         GmemTiledCopyKV{},
         make_tensor(make_gmem_ptr(static_cast<Element const*>(nullptr)), ShapeQKV{}, StrideQK{}),
@@ -286,7 +483,11 @@ struct CollectiveMainloopFwdSm90 {
     using TMA_Qv = std::conditional_t<HasQv, TMA_Qv_, std::nullptr_t>;
 
     // Set the bytes transferred in this TMA transaction (may involve multiple issues)
+#if USE_MIX_WGMMA
+    static constexpr uint32_t TmaTransactionBytesQ = static_cast<uint32_t>(QSmemElements * cutlass::sizeof_bits_v<Element> / 8);
+#else
     static constexpr uint32_t TmaTransactionBytesQ = static_cast<uint32_t>(size(SmemLayoutQ{}) * cutlass::sizeof_bits_v<Element> / 8);
+#endif
     static constexpr uint32_t TmaTransactionBytesK = static_cast<uint32_t>(size(take<0, 2>(SmemLayoutK{})) * cutlass::sizeof_bits_v<Element> / 8);
     static constexpr uint32_t TmaTransactionBytesV = static_cast<uint32_t>(size(take<0, 2>(SmemLayoutVt{})) * cutlass::sizeof_bits_v<Element> / 8);
     static constexpr uint32_t TmaTransactionBytesQv = static_cast<uint32_t>(size(SmemLayoutQv{}) * cutlass::sizeof_bits_v<Element> / 8);
@@ -310,9 +511,21 @@ struct CollectiveMainloopFwdSm90 {
     static constexpr size_t SmemAlignmentP = cutlass::detail::alignment_for_swizzle(SmemLayoutP{});
     static_assert(SmemAlignmentP >= 128, "Require at least 128B alignment");
 
+#if USE_MIX_WGMMA
+    using SmemP_t = std::conditional_t<
+        HasPSmem, cute::array_aligned<Element, PSmemElements, SmemAlignmentP>,
+        cute::array<Element, 0>>;
+#else
     using SmemP_t = std::conditional_t<MmaPV_is_RS, cute::array<Element, 0>, cute::array_aligned<Element, cute::cosize_v<SmemLayoutP>, SmemAlignmentP>>;
+#endif
     using SmemScale_t = std::conditional_t<!LargeHeadDimV, cute::array<float, 0>, cute::array_aligned<float, cute::cosize_v<SmemLayoutScale>, 128>>;
     using SmemQv_t = std::conditional_t<!HasQv, cute::array<Element, 0>, cute::array_aligned<Element, cute::cosize_v<SmemLayoutQv>, SmemAlignmentQv>>;
+#if USE_MIX_WGMMA
+    using SmemQ_t = std::conditional_t<
+        QSmemElements == 0,
+        cute::array<Element, 0>,
+        cute::array_aligned<Element, QSmemElements, SmemAlignmentQ>>;
+#endif
     // Sometimes even with SmemP_t = cute::array<Element, 0>, putting it in the TensorStorage struct causes
     // smem size to go from 227KB to 228KB and we get "invalid argument".
 
@@ -327,7 +540,11 @@ struct CollectiveMainloopFwdSm90 {
 
     struct TensorStorageWithoutPNoTranspose : cute::aligned_struct<cute::max(SmemAlignmentQ, SmemAlignmentK, SmemAlignmentVtNoTranspose), _0> {
         cute::array_aligned<Element, cute::cosize_v<SmemLayoutVt>, SmemAlignmentVtNoTranspose> smem_v;
+#if USE_MIX_WGMMA
+        SmemQ_t smem_q;
+#else
         cute::array_aligned<Element, cute::cosize_v<SmemLayoutQ>, SmemAlignmentQ> smem_q;
+#endif
         cute::array_aligned<Element, cute::cosize_v<SmemLayoutK>, SmemAlignmentK> smem_k;
         SmemQv_t smem_qv;
         #if USE_MMA_SOFTMAX
@@ -337,7 +554,11 @@ struct CollectiveMainloopFwdSm90 {
 
     struct TensorStorageWithPNoTranspose : cute::aligned_struct<cute::max(SmemAlignmentQ, SmemAlignmentK, SmemAlignmentVtNoTranspose, SmemAlignmentP), _0> {
         cute::array_aligned<Element, cute::cosize_v<SmemLayoutVt>, SmemAlignmentVtNoTranspose> smem_v;
+#if USE_MIX_WGMMA
+        SmemQ_t smem_q;
+#else
         cute::array_aligned<Element, cute::cosize_v<SmemLayoutQ>, SmemAlignmentQ> smem_q;
+#endif
         cute::array_aligned<Element, cute::cosize_v<SmemLayoutK>, SmemAlignmentK> smem_k;
         SmemQv_t smem_qv;
         SmemP_t smem_p;
@@ -347,18 +568,23 @@ struct CollectiveMainloopFwdSm90 {
     };
     struct TensorStorageWithPScaleNoTranspose : cute::aligned_struct<cute::max(SmemAlignmentQ, SmemAlignmentK, SmemAlignmentVtNoTranspose, SmemAlignmentP), _0> {
         cute::array_aligned<Element, cute::cosize_v<SmemLayoutVt>, SmemAlignmentVtNoTranspose> smem_v;
+#if USE_MIX_WGMMA
+        SmemQ_t smem_q;
+#else
         cute::array_aligned<Element, cute::cosize_v<SmemLayoutQ>, SmemAlignmentQ> smem_q;
+#endif
         cute::array_aligned<Element, cute::cosize_v<SmemLayoutK>, SmemAlignmentK> smem_k;
         SmemQv_t smem_qv;
         SmemP_t smem_p;
         SmemScale_t smem_scale;
-        #if USE_MMA_SOFTMAX
-        SmemWGMMAFaddReduceB_t smem_wgmma_fadd_reduce_b;
-        #endif
     };
 
     using TensorStorageNoTranspose = std::conditional_t<
+#if USE_MIX_WGMMA
+        !HasPSmem,
+#else
         MmaPV_is_RS,
+#endif
         TensorStorageWithoutPNoTranspose,
         std::conditional_t<!LargeHeadDimV, TensorStorageWithPNoTranspose, TensorStorageWithPScaleNoTranspose>
     >;
@@ -366,10 +592,14 @@ struct CollectiveMainloopFwdSm90 {
     static constexpr size_t SmemAlignmentVt = cutlass::detail::alignment_for_swizzle(SmemLayoutVt{});
     static constexpr size_t SmemAlignmentV = cutlass::detail::alignment_for_swizzle(SmemLayoutVtMma{});
     static_assert(SmemAlignmentVt >= 128 and SmemAlignmentV >= 128, "Require at least 128B alignment");
-    struct TensorStorageTransposeV : cute::aligned_struct<cute::max(SmemAlignmentQ, SmemAlignmentK, SmemAlignmentV), _0> {
+    struct TensorStorageTransposeVWithoutP : cute::aligned_struct<cute::max(SmemAlignmentQ, SmemAlignmentK, SmemAlignmentV), _0> {
         cute::array_aligned<Element, cute::cosize_v<SmemLayoutVtMma>, SmemAlignmentV> smem_v;
         cute::array_aligned<Element, cute::cosize_v<SmemLayoutVt>, SmemAlignmentVt> smem_vt;
+#if USE_MIX_WGMMA
+        SmemQ_t smem_q;
+#else
         cute::array_aligned<Element, cute::cosize_v<SmemLayoutQ>, SmemAlignmentQ> smem_q;
+#endif
         cute::array_aligned<Element, cute::cosize_v<SmemLayoutK>, SmemAlignmentK> smem_k;
         SmemQv_t smem_qv;
         SmemScale_t smem_scale;
@@ -378,10 +608,28 @@ struct CollectiveMainloopFwdSm90 {
         #endif
     };
 
+#if USE_MIX_WGMMA
+    struct TensorStorageTransposeVWithP : cute::aligned_struct<cute::max(SmemAlignmentQ, SmemAlignmentK, SmemAlignmentV, SmemAlignmentP), _0> {
+        cute::array_aligned<Element, cute::cosize_v<SmemLayoutVtMma>, SmemAlignmentV> smem_v;
+        cute::array_aligned<Element, cute::cosize_v<SmemLayoutVt>, SmemAlignmentVt> smem_vt;
+        SmemQ_t smem_q;
+        cute::array_aligned<Element, cute::cosize_v<SmemLayoutK>, SmemAlignmentK> smem_k;
+        SmemQv_t smem_qv;
+        SmemP_t smem_p;
+        SmemScale_t smem_scale;
+    };
+    using TensorStorageTransposeV = std::conditional_t<
+        HasPSmem, TensorStorageTransposeVWithP, TensorStorageTransposeVWithoutP>;
+#else
+    using TensorStorageTransposeV = TensorStorageTransposeVWithoutP;
+#endif
+
     using TensorStorage = std::conditional_t<!Transpose_V, TensorStorageNoTranspose, TensorStorageTransposeV>;
 
     // These are tuned for speed. They don't affect correctness.
-    #if ENABLE_CUSTOM_SM90_SCHED_BARRIER_OVERRIDE
+    #if USE_MIX_WGMMA
+    static constexpr bool UseSchedulerBarrier = Config.use_scheduler_barrier != 0;
+    #elif ENABLE_CUSTOM_SM90_SCHED_BARRIER_OVERRIDE
     static constexpr bool UseSchedulerBarrier = CUSTOM_OVERRIDE_SCHED_BARRIER;
     #else
     static constexpr bool UseSchedulerBarrier = (IntraWGOverlap
@@ -468,7 +716,14 @@ struct CollectiveMainloopFwdSm90 {
         cutlass::FastDivmod page_size_divmod;
         cutlass::FastDivmod blockN_per_page_size_divmod;
         cutlass::FastDivmod qhead_per_khead_divmod;
+#if USE_MIX_WGMMA
+        TMA_QActive tma_load_Q;
+        TMA_Q128Active tma_load_Q128;
+        TMA_Q64Active tma_load_Q64;
+        TMA_Q32Active tma_load_Q32;
+#else
         TMA_Q tma_load_Q;
+#endif
         TMA_K tma_load_K;
         TMA_V tma_load_V;
         TMA_K tma_load_K_new;
@@ -493,12 +748,38 @@ struct CollectiveMainloopFwdSm90 {
     static Params
     to_underlying_arguments(Arguments const& args) {
         Tensor mQ = make_tensor(make_gmem_ptr(args.ptr_Q), args.shape_Q, args.stride_Q);
+#if USE_MIX_WGMMA
+        auto tma_load_Q = [&] {
+            if constexpr (!HasQReg) {
+                return make_tma_copy_A_sm90(GmemTiledCopyQ{}, mQ, SmemLayoutQ{},
+                                            TileShape_MNK{}, ClusterShape{});
+            } else { return nullptr; }
+        }();
+        auto tma_load_Q128 = [&] {
+            if constexpr (HasQ128) {
+                return make_tma_copy_A_sm90(
+                    GmemTiledCopyQ{}, mQ, SmemLayoutQ128{},
+                    Shape<Int<kBlockM>, Int<kBlockN>, Int<Q128ColsSafe>>{}, ClusterShape{});
+            } else { return nullptr; }
+        }();
+        auto tma_load_Q64 = [&] {
+            if constexpr (HasQ64) {
+                return make_tma_copy_A_sm90(
+                    GmemTiledCopyQ{}, mQ, SmemLayoutQ64{},
+                    Shape<Int<kBlockM>, Int<kBlockN>, Int<Q64ColsSafe>>{}, ClusterShape{});
+            } else { return nullptr; }
+        }();
+        auto tma_load_Q32 = [&] {
+            if constexpr (HasQ32) {
+                return make_tma_copy_A_sm90(
+                    GmemTiledCopyQ{}, mQ, SmemLayoutQ32{},
+                    Shape<Int<kBlockM>, Int<kBlockN>, Int<Q32ColsSafe>>{}, ClusterShape{});
+            } else { return nullptr; }
+        }();
+#else
         TMA_Q tma_load_Q = make_tma_copy_A_sm90(
-            GmemTiledCopyQ{},
-            mQ,
-            SmemLayoutQ{},
-            TileShape_MNK{},
-            ClusterShape{}); // no mcast for Q
+            GmemTiledCopyQ{}, mQ, SmemLayoutQ{}, TileShape_MNK{}, ClusterShape{});
+#endif
         Tensor mK = make_tensor(make_gmem_ptr(args.ptr_K), args.shape_K, args.stride_K);
         TMA_K tma_load_K = make_tma_copy_B_sm90(
             GmemTiledCopyKV{},
@@ -587,7 +868,12 @@ struct CollectiveMainloopFwdSm90 {
                 cutlass::FastDivmod(page_size),  // page_size_divmod
                 cutlass::FastDivmod(!args.ptr_pagetable ? 1 : cute::ceil_div(page_size, kBlockN)),  // blockN_per_page_size_divmod
                 cutlass::FastDivmod(cute::ceil_div(get<2>(args.shape_Q), get<2>(args.shape_K))),
-                tma_load_Q, tma_load_K, tma_load_V, tma_load_K_new, tma_load_V_new, tma_load_Qv,
+#if USE_MIX_WGMMA
+                tma_load_Q, tma_load_Q128, tma_load_Q64, tma_load_Q32,
+#else
+                tma_load_Q,
+#endif
+                tma_load_K, tma_load_V, tma_load_K_new, tma_load_V_new, tma_load_Qv,
                 !Has_softcap ? float(args.softmax_scale * M_LOG2E) : float(args.softcap_val * M_LOG2E),
                 args.ptr_q_descale, args.ptr_k_descale, args.ptr_v_descale,
                 args.stride_q_descale, args.stride_k_descale, args.stride_v_descale,
@@ -603,7 +889,17 @@ struct CollectiveMainloopFwdSm90 {
     CUTLASS_DEVICE
     static void prefetch_tma_descriptors(Params const& params) {
         if constexpr (Use_TMA_Q) {
+#if USE_MIX_WGMMA
+            if constexpr (!HasQReg) {
+                cute::prefetch_tma_descriptor(params.tma_load_Q.get_tma_descriptor());
+            } else {
+                if constexpr (HasQ128) { cute::prefetch_tma_descriptor(params.tma_load_Q128.get_tma_descriptor()); }
+                if constexpr (HasQ64) { cute::prefetch_tma_descriptor(params.tma_load_Q64.get_tma_descriptor()); }
+                if constexpr (HasQ32) { cute::prefetch_tma_descriptor(params.tma_load_Q32.get_tma_descriptor()); }
+            }
+#else
             cute::prefetch_tma_descriptor(params.tma_load_Q.get_tma_descriptor());
+#endif
             if constexpr (HasQv) {
                 cute::prefetch_tma_descriptor(params.tma_load_Qv.get_tma_descriptor());
             }
@@ -648,7 +944,15 @@ struct CollectiveMainloopFwdSm90 {
             }
         }
 
+#if USE_MIX_WGMMA
+        auto smem_q_ptr = shared_storage.tensors.mainloop.smem_q.data();
+        Tensor sQ = make_tensor(make_smem_ptr(smem_q_ptr), SmemLayoutQ{});
+        Tensor sQ128 = make_tensor(make_smem_ptr(smem_q_ptr + Q128SmemOffset), SmemLayoutQ128{});
+        Tensor sQ64 = make_tensor(make_smem_ptr(smem_q_ptr + Q64SmemOffset), SmemLayoutQ64{});
+        Tensor sQ32 = make_tensor(make_smem_ptr(smem_q_ptr + Q32SmemOffset), SmemLayoutQ32{});
+#else
         Tensor sQ = make_tensor(make_smem_ptr(shared_storage.tensors.mainloop.smem_q.data()), SmemLayoutQ{});
+#endif
         Tensor sK = make_tensor(make_smem_ptr(shared_storage.tensors.mainloop.smem_k.data()), SmemLayoutK{});
         Tensor sK_pi = as_position_independent_swizzle_tensor(sK);
         // as_position_independent_swizzle_tensor makes address calculation easier when we do LDSM & STSM to transpose.
@@ -683,22 +987,90 @@ struct CollectiveMainloopFwdSm90 {
 
         bool const is_varlen_q = Varlen && params.cu_seqlens_q;
         bool const is_varlen_k = Varlen && params.cu_seqlens_k;
+#if USE_MIX_WGMMA
+        auto mQ = [&] {
+            if constexpr (!HasQReg) {
+                return params.tma_load_Q.get_tma_tensor(params.shape_Q)(_, _, bidh, !is_varlen_q ? bidb : 0);
+            } else { return nullptr; }
+        }();
+#else
         Tensor mQ = params.tma_load_Q.get_tma_tensor(params.shape_Q)(_, _, bidh, !is_varlen_q ? bidb : 0);
+#endif
         Tensor mK_TMA = params.tma_load_K.get_tma_tensor(params.shape_K)(_, _, bidh_kv, _);
         auto shape_V = make_shape(params.headdim_v, get<0>(params.shape_K), get<2>(params.shape_K), get<3>(params.shape_K));
         Tensor mVt_TMA = params.tma_load_V.get_tma_tensor(shape_V)(_, _, bidh_kv, _);
         // 定位 global-memory tile
+#if USE_MIX_WGMMA
+        auto gQ = [&] {
+            if constexpr (!HasQReg) {
+                return local_tile(domain_offset(make_coord(seqlen_info.offset_q, _0{}), mQ),
+                                  select<0, 2>(TileShape_MNK{}), make_coord(m_block, _0{}));
+            } else { return nullptr; }
+        }();
+        auto gQ128 = [&] {
+            if constexpr (HasQ128) {
+                auto tensor = params.tma_load_Q128.get_tma_tensor(params.shape_Q)(_, _, bidh, !is_varlen_q ? bidb : 0);
+                return local_tile(domain_offset(make_coord(seqlen_info.offset_q, _0{}), tensor),
+                                  Shape<Int<kBlockM>, Int<Q128ColsSafe>>{}, make_coord(m_block, _0{}));
+            } else { return nullptr; }
+        }();
+        auto gQ64 = [&] {
+            if constexpr (HasQ64) {
+                auto tensor = params.tma_load_Q64.get_tma_tensor(params.shape_Q)(_, _, bidh, !is_varlen_q ? bidb : 0);
+                return local_tile(domain_offset(make_coord(seqlen_info.offset_q, Int<Q128Cols>{}), tensor),
+                                  Shape<Int<kBlockM>, Int<Q64ColsSafe>>{}, make_coord(m_block, _0{}));
+            } else { return nullptr; }
+        }();
+        auto gQ32 = [&] {
+            if constexpr (HasQ32) {
+                auto tensor = params.tma_load_Q32.get_tma_tensor(params.shape_Q)(_, _, bidh, !is_varlen_q ? bidb : 0);
+                return local_tile(domain_offset(make_coord(seqlen_info.offset_q, Int<Q128Cols + Q64Cols>{}), tensor),
+                                  Shape<Int<kBlockM>, Int<Q32ColsSafe>>{}, make_coord(m_block, _0{}));
+            } else { return nullptr; }
+        }();
+#else
         Tensor gQ = local_tile(domain_offset(make_coord(seqlen_info.offset_q, _0{}), mQ), select<0, 2>(TileShape_MNK{}), make_coord(m_block, _0{}));  // (M, K)
-        // if (cute::thread0()) { printf("Varlen = %d, params.leftpad_k = %p, leftpad_k = %d\n", Varlen, params.leftpad_k, leftpad_k); }
+#endif
         // 所有候选 K blocks
         Tensor gK_TMA = local_tile(domain_offset(make_coord(seqlen_info.offset_k, _0{}, _0{}), mK_TMA), select<1, 2>(TileShape_MNK{}), make_coord(_, _0{}, _));  // (N, K, _, _)
         // 所有候选 V blocks
         Tensor gVt_TMA = local_tile(domain_offset(make_coord(_0{}, seqlen_info.offset_k, _0{}), mVt_TMA), select<1, 2>(TileShape_MNK_PV{}), make_coord(_0{}, _, _));  // (K, N, _, _)
         
         // 分成适合 TMA 发起的分片
+#if USE_MIX_WGMMA
+        auto [tQgQ, tQsQ] = [&] {
+            if constexpr (!HasQReg) {
+                auto block = params.tma_load_Q.get_slice(_0{});
+                return cute::make_tuple(group_modes<0, 3>(block.partition_S(gQ)),
+                                        group_modes<0, 3>(block.partition_D(sQ)));
+            } else { return cute::make_tuple(nullptr, nullptr); }
+        }();
+        auto [tQ128gQ, tQ128sQ] = [&] {
+            if constexpr (HasQ128) {
+                auto block = params.tma_load_Q128.get_slice(_0{});
+                return cute::make_tuple(group_modes<0, 3>(block.partition_S(gQ128)),
+                                        group_modes<0, 3>(block.partition_D(sQ128)));
+            } else { return cute::make_tuple(nullptr, nullptr); }
+        }();
+        auto [tQ64gQ, tQ64sQ] = [&] {
+            if constexpr (HasQ64) {
+                auto block = params.tma_load_Q64.get_slice(_0{});
+                return cute::make_tuple(group_modes<0, 3>(block.partition_S(gQ64)),
+                                        group_modes<0, 3>(block.partition_D(sQ64)));
+            } else { return cute::make_tuple(nullptr, nullptr); }
+        }();
+        auto [tQ32gQ, tQ32sQ] = [&] {
+            if constexpr (HasQ32) {
+                auto block = params.tma_load_Q32.get_slice(_0{});
+                return cute::make_tuple(group_modes<0, 3>(block.partition_S(gQ32)),
+                                        group_modes<0, 3>(block.partition_D(sQ32)));
+            } else { return cute::make_tuple(nullptr, nullptr); }
+        }();
+#else
         auto block_tma_Q = params.tma_load_Q.get_slice(_0{});
         Tensor tQgQ = group_modes<0, 3>(block_tma_Q.partition_S(gQ));  // (TMA)
         Tensor tQsQ = group_modes<0, 3>(block_tma_Q.partition_D(sQ));  // (TMA)
+#endif
         // tma_partition doesn't handle position_independent_swizzle_tensor correctly, so we need to do it manually
         auto block_tma_K = params.tma_load_K.get_slice(cluster_local_block_id.x);
         Tensor tKgK_TMA = group_modes<0, 3>(block_tma_K.partition_S(gK_TMA));  // (TMA, k, batch)
@@ -844,22 +1216,40 @@ struct CollectiveMainloopFwdSm90 {
             // load KV
             // 因为 V 还需要经过额外的转置流水线，可以更早启动。
             if constexpr (Transpose_V) { load_V(n_block, smem_pipe_write, cute::true_type{} /*Seqlenk_mask*/); }
-            // if (thread_idx == 0) { printf("Producer: main load, before load_K, index = %d\n", smem_pipe_write.index());}
             load_K(n_block, smem_pipe_write, cute::true_type{} /*Seqlenk_mask*/);
-            // if (thread_idx == 0) { printf("Producer: main load, after load K, index = %d\n", smem_pipe_write.index());}
         }
 
         if constexpr (Use_TMA_Q) {
             // Wait for the MMA warpgroups to signal that smem_q is ready
-            if (SingleProducerWarp || warp_idx_in_warpgroup == 0) {
+            if constexpr (HasQSmem) {
+              if (SingleProducerWarp || warp_idx_in_warpgroup == 0) {
                 cutlass::arch::NamedBarrier::sync(NumMmaThreadsQK + cutlass::NumThreadsPerWarp, static_cast<uint32_t>(FwdNamedBarriers::QueryEmpty) /*id*/);
+              }
             }
 
             // load Q
-            if ((SingleProducerWarp || warp_idx_in_warpgroup == 0) && cute::elect_one_sync()) {
-                shared_storage.pipelines.barrier_Q.arrive_and_expect_tx(TmaTransactionBytesQ);
-                copy(params.tma_load_Q.with(reinterpret_cast<typename cutlass::arch::ClusterTransactionBarrier::ValueType&>(shared_storage.pipelines.barrier_Q), 0 /*mcast_mask*/, !Split ? TMA::CacheHintSm90::EVICT_FIRST : TMA::CacheHintSm90::EVICT_LAST),
-                    tQgQ, tQsQ);
+            if (HasQSmem && (SingleProducerWarp || warp_idx_in_warpgroup == 0) && cute::elect_one_sync()) {
+                auto &barrier_Q = shared_storage.pipelines.barrier_Q;
+                barrier_Q.arrive_and_expect_tx(TmaTransactionBytesQ);
+                auto &barrier_Q_value = reinterpret_cast<typename cutlass::arch::ClusterTransactionBarrier::ValueType&>(barrier_Q);
+                auto const q_cache_hint = !Split ? TMA::CacheHintSm90::EVICT_FIRST : TMA::CacheHintSm90::EVICT_LAST;
+#if USE_MIX_WGMMA
+                if constexpr (!HasQReg) {
+                    copy(params.tma_load_Q.with(barrier_Q_value, 0 /*mcast_mask*/, q_cache_hint), tQgQ, tQsQ);
+                } else {
+                    if constexpr (HasQ128) {
+                        copy(params.tma_load_Q128.with(barrier_Q_value, 0 /*mcast_mask*/, q_cache_hint), tQ128gQ, tQ128sQ);
+                    }
+                    if constexpr (HasQ64) {
+                        copy(params.tma_load_Q64.with(barrier_Q_value, 0 /*mcast_mask*/, q_cache_hint), tQ64gQ, tQ64sQ);
+                    }
+                    if constexpr (HasQ32) {
+                        copy(params.tma_load_Q32.with(barrier_Q_value, 0 /*mcast_mask*/, q_cache_hint), tQ32gQ, tQ32sQ);
+                    }
+                }
+#else
+                copy(params.tma_load_Q.with(barrier_Q_value, 0 /*mcast_mask*/, q_cache_hint), tQgQ, tQsQ);
+#endif
                 if constexpr (HasQv) {
                     shared_storage.pipelines.barrier_Qv.arrive_and_expect_tx(TmaTransactionBytesQv);
                     copy(params.tma_load_Qv.with(reinterpret_cast<typename cutlass::arch::ClusterTransactionBarrier::ValueType&>(shared_storage.pipelines.barrier_Qv), 0 /*mcast_mask*/, !Split ? TMA::CacheHintSm90::EVICT_FIRST : TMA::CacheHintSm90::EVICT_LAST),
@@ -889,10 +1279,8 @@ struct CollectiveMainloopFwdSm90 {
         // Wait for the MMA WGs to signal that smem_v are ready and V can be copied from gmem
         // Need ClusterBarrier, not just NamedBarrier. Otherwise we might have CTA 0 finishing the
         // TMA store on O first, call TMA multicast load on V, before CTA 1 can finishing TMA store on O.
-        // if (thread_idx == 0) { printf("Producer: main load, before barrier_O, work_idx = %d\n", work_idx);}
         // 完事后等待smemO的写回
         shared_storage.pipelines.barrier_O.wait((work_idx + 1) % 2);
-        // if (thread_idx == 0) { printf("Producer: main load, after barrier_O\n");}
 
         // Transpose_V == false (fp16), Transpose_V == true (fp8)
         if constexpr (!Transpose_V && !IntraWGOverlap) {
@@ -980,27 +1368,21 @@ struct CollectiveMainloopFwdSm90 {
     CUTLASS_DEVICE void
     warp_scheduler_barrier_arrive() {
         if constexpr (UseSchedulerBarrier) {
-            static_assert(NumMmaWarpGroups == 2 || NumMmaWarpGroups == 3);
+            static_assert(NumMmaWarpGroups >= 2 && NumMmaWarpGroups <= 4);
             int const cur_WG = flash::canonical_warp_group_idx_nosync() - 1;
-            // Adjusted for WG2 → WG1 (NumMmaWarpGroups=2) or WG3 → WG2 → WG1 (NumMmaWarpGroups=3)
-            int const next_WG = NumMmaWarpGroups == 2
-                ? 1 - cur_WG  // WG2 (cur_WG=1) → WG1 (cur_WG=0), WG1 → WG2
-                : (cur_WG > 0 ? cur_WG - 1 : 2);  // WG3 (cur_WG=2) → WG2 (cur_WG=1) → WG1 (cur_WG=0) → WG3
-            // Map next_WG to warp_group_idx
-            int const next_warp_group_idx = next_WG + 1; // cur_WG=0 → WG1, cur_WG=1 → WG2, cur_WG=2 → WG3
-            cutlass::arch::NamedBarrier::arrive(2 * cutlass::NumThreadsPerWarpGroup, 
-                                                static_cast<uint32_t>(FwdNamedBarriers::WarpSchedulerWG1) - 1 + next_warp_group_idx /*id*/);
+            int const next_WG = cur_WG > 0 ? cur_WG - 1 : NumMmaWarpGroups - 1;
+            cutlass::arch::NamedBarrier::arrive(
+                2 * cutlass::NumThreadsPerWarpGroup,
+                static_cast<uint32_t>(FwdNamedBarriers::WarpSchedulerWG1) + next_WG /*id*/);
         }
     }
     #else
     CUTLASS_DEVICE void
     warp_scheduler_barrier_arrive() {
         if constexpr (UseSchedulerBarrier) {
-            static_assert(NumMmaWarpGroups == 2 || NumMmaWarpGroups == 3);
+            static_assert(NumMmaWarpGroups >= 2 && NumMmaWarpGroups <= 4);
             int const cur_WG = flash::canonical_warp_group_idx_nosync() - 1;
-            int const next_WG = NumMmaWarpGroups == 2
-                ? 1 - cur_WG
-                : (cur_WG < NumMmaWarpGroups - 1 ? cur_WG + 1 : 0);
+            int const next_WG = cur_WG < NumMmaWarpGroups - 1 ? cur_WG + 1 : 0;
             cutlass::arch::NamedBarrier::arrive(2 * cutlass::NumThreadsPerWarpGroup, static_cast<uint32_t>(FwdNamedBarriers::WarpSchedulerWG1) + next_WG /*id*/);
         }
     }
@@ -1011,23 +1393,20 @@ struct CollectiveMainloopFwdSm90 {
     mma_init() {
         int warp_group_idx = flash::canonical_warp_group_idx_nosync();
         // Tell producers that smem_q is ready
-        if (!LargeHeadDimV || warp_group_idx == 1) {
+        if (HasQSmem && (!LargeHeadDimV || warp_group_idx == 1)) {
             cutlass::arch::NamedBarrier::arrive(NumMmaThreadsQK + (Use_TMA_Q ? cutlass::NumThreadsPerWarp : NumProducerThreads), static_cast<uint32_t>(FwdNamedBarriers::QueryEmpty) /*id*/);
         }
         if (LargeHeadDimV && warp_group_idx > 1) {
             cutlass::arch::NamedBarrier::arrive(NumMmaThreads, static_cast<uint32_t>(FwdNamedBarriers::PEmpty) /*id*/);
         }
         if constexpr (UseSchedulerBarrier) {
-            static_assert(NumMmaWarpGroups == 2 || NumMmaWarpGroups == 3);
-            if constexpr (NumMmaWarpGroups == 2) {
-                // start from WG2
-                if (warp_group_idx == 2) {
-                    cutlass::arch::NamedBarrier::arrive(2 * cutlass::NumThreadsPerWarpGroup, static_cast<uint32_t>(FwdNamedBarriers::WarpSchedulerWG2) /*id*/);
-                }
-            } else {
-                if (warp_group_idx == 3) {
-                    cutlass::arch::NamedBarrier::arrive(2 * cutlass::NumThreadsPerWarpGroup, static_cast<uint32_t>(FwdNamedBarriers::WarpSchedulerWG3) /*id*/);
-                }
+            static_assert(NumMmaWarpGroups >= 2 && NumMmaWarpGroups <= 4);
+            // The inverse ring starts from the last consumer WG.
+            if (warp_group_idx == NumMmaWarpGroups) {
+                cutlass::arch::NamedBarrier::arrive(
+                    2 * cutlass::NumThreadsPerWarpGroup,
+                    static_cast<uint32_t>(FwdNamedBarriers::WarpSchedulerWG1)
+                        + NumMmaWarpGroups - 1 /*id*/);
             }
         }
     }
@@ -1036,15 +1415,14 @@ struct CollectiveMainloopFwdSm90 {
     mma_init() {
         int warp_group_idx = flash::canonical_warp_group_idx_nosync();
         // Tell producers that smem_q is ready
-        if (!LargeHeadDimV || warp_group_idx == 1) {
+        if (HasQSmem && (!LargeHeadDimV || warp_group_idx == 1)) {
             cutlass::arch::NamedBarrier::arrive(NumMmaThreadsQK + (Use_TMA_Q ? cutlass::NumThreadsPerWarp : NumProducerThreads), static_cast<uint32_t>(FwdNamedBarriers::QueryEmpty) /*id*/);
         }
         if (LargeHeadDimV && warp_group_idx > 1) {
             cutlass::arch::NamedBarrier::arrive(NumMmaThreads, static_cast<uint32_t>(FwdNamedBarriers::PEmpty) /*id*/);
         }
         if constexpr (UseSchedulerBarrier) {
-            // We have NamedBarrier for up to 3 WGs
-            static_assert(NumMmaWarpGroups == 2 || NumMmaWarpGroups == 3);
+            static_assert(NumMmaWarpGroups >= 2 && NumMmaWarpGroups <= 4);
             // WG1 needs the very first signal to start
             if (warp_group_idx == 1) {
                 cutlass::arch::NamedBarrier::arrive(2 * cutlass::NumThreadsPerWarpGroup, static_cast<uint32_t>(FwdNamedBarriers::WarpSchedulerWG1) /*id*/);
@@ -1053,6 +1431,59 @@ struct CollectiveMainloopFwdSm90 {
     }
     #endif
 
+#if USE_MIX_WGMMA
+    CUTLASS_DEVICE auto
+    make_q_reg_fragment(int const thread_idx) const {
+        static_assert(HasQReg);
+        TiledMmaQKRS tiled_mma_qk_rs;
+        // RS-Q is a register operand: each thread owns a distinct fragment.
+        // Warp-group slices are only appropriate for shared-memory GMMA
+        // descriptors and would make every lane partition the same Q values.
+        auto thread_mma_qk_rs = tiled_mma_qk_rs.get_thread_slice(thread_idx);
+        Tensor gQRegPlaceholder = make_tensor(
+            make_gmem_ptr(static_cast<Element const*>(nullptr)),
+            make_layout(Shape<Int<kBlockM>, Int<QRegColsSafe>>{},
+                        Stride<Int<kHeadDim>, _1>{}));
+        return thread_mma_qk_rs.partition_fragment_A(gQRegPlaceholder);
+    }
+
+    template <typename FrgTensorQ>
+    CUTLASS_DEVICE void
+    load_q_regs(Params const& params,
+                FrgTensorQ& tRrQ,
+                SeqlenInfo_t const& seqlen_info,
+                cute::tuple<int32_t, int32_t, int32_t, int32_t> const& block_coord,
+                int const thread_idx) const {
+        static_assert(HasQReg);
+        int const m_block = get<0>(block_coord);
+        int const bidh = get<1>(block_coord);
+        int const bidb = get<2>(block_coord);
+        bool const is_varlen_q = Varlen && params.cu_seqlens_q;
+        Tensor mQReg = make_tensor(make_gmem_ptr(params.ptr_Q), params.shape_Q, params.stride_Q)(
+            _, _, bidh, !is_varlen_q ? bidb : 0);
+        Tensor gQReg = local_tile(
+            domain_offset(make_coord(seqlen_info.offset_q, Int<QSmemCols>{}), mQReg),
+            Shape<Int<kBlockM>, Int<QRegColsSafe>>{}, make_coord(m_block, _0{}));
+
+        TiledMmaQKRS tiled_mma_qk_rs;
+        auto thread_mma_qk_rs = tiled_mma_qk_rs.get_thread_slice(thread_idx);
+        Tensor tRgQ = thread_mma_qk_rs.partition_A(gQReg);
+        if ((m_block + 1) * kBlockM <= seqlen_info.seqlen_q) {
+            Copy_Atom<AutoVectorizingCopyWithAssumedAlignment<128>, Element> gmem_copy_Q;
+            cute::copy(gmem_copy_Q, tRgQ, tRrQ);
+        } else {
+            Tensor cQReg = cute::make_identity_tensor(Shape<Int<kBlockM>, Int<QRegColsSafe>>{});
+            Tensor tRcQ = thread_mma_qk_rs.partition_A(cQReg);
+            CUTLASS_PRAGMA_UNROLL
+            for (int i = 0; i < size(tRrQ); ++i) {
+                tRrQ(i) = m_block * kBlockM + get<0>(tRcQ(i)) < seqlen_info.seqlen_q
+                    ? tRgQ(i) : Element(0);
+            }
+        }
+    }
+#endif
+
+#if USE_MMA_SOFTMAX
     template <typename SharedStorage, typename FrgTensorO, typename Softmax>
     CUTLASS_DEVICE bool
     mma_wgmma_reduce(Params const& params,
@@ -1136,6 +1567,7 @@ struct CollectiveMainloopFwdSm90 {
         Tensor tSrQ = wg_mma_qk.partition_fragment_A(sQ);
         Tensor tSrK = wg_mma_qk.partition_fragment_B(sK);
         Tensor tOrV = wg_mma_pv.partition_fragment_B(sV);
+        Tensor tOsV = tOrV;
         Tensor tOsP = wg_mma_pv.partition_fragment_A(sP);
         Tensor tSrQv = wg_mma_qv.partition_fragment_A(sQv);
         Tensor tSrV = wg_mma_qv.partition_fragment_B(sVMmaQV);
@@ -1160,14 +1592,8 @@ struct CollectiveMainloopFwdSm90 {
             auto barrier_token = pipeline.consumer_try_wait(smem_pipe_read);
             pipeline.consumer_wait(smem_pipe_read, barrier_token);
         };
-        // CUSTOM NOTE: these two are real seqlen
         int const seqlen_q = seqlen_info.seqlen_q;
         int const seqlen_k = seqlen_info.seqlen_k;
-        ////// CUSTOM DEBUG //////
-        // if (cute::thread(128, 0)){
-        //     printf("seqlen_q = %d, seqlen_k = %d\n", seqlen_q, seqlen_k);
-        // }
-        ////// CUSTOM DEBUG //////
         int n_block = n_block_max - 1;
 
         flash::Mask<kBlockM, kBlockN, PackGQA, TiledMmaQK> mask(
@@ -1203,9 +1629,10 @@ struct CollectiveMainloopFwdSm90 {
         };
 
         auto &barrier_Q = shared_storage.pipelines.barrier_Q;
-        if constexpr (!AppendKV) {
-            barrier_Q.wait(work_idx % 2);
-        } else {
+        if constexpr (HasQSmem) {
+          if constexpr (!AppendKV) {
+              barrier_Q.wait(work_idx % 2);
+          } else {
             if (get<1>(params.shape_rotary) > 0) {  // Apply rotary to Q
                 using Rotary_t = Rotary<kBlockM, kHeadDim, NumMmaThreadsQK, Element, !(Is_causal || Is_local) /*FixedPosition*/>;
                 Rotary_t rotary(params.ptr_rotary_cos, params.shape_rotary, params.stride_rotary_cos,
@@ -1235,6 +1662,7 @@ struct CollectiveMainloopFwdSm90 {
             } else {
                 barrier_Q.wait(work_idx % 2);
             }
+          }
         }
 
         if constexpr (MmaQK_is_RS) {
@@ -1245,11 +1673,22 @@ struct CollectiveMainloopFwdSm90 {
             Tensor tSsQ_copy_view = smem_thr_copy_Q.partition_S(cute::as_position_independent_swizzle_tensor(sQ));
             cute::copy(smem_tiled_copy_Q, tSsQ_copy_view, tSrQ_copy_view);
         }
+        auto gemm_qk = [&](auto const& tK, auto& tS) {
+            flash::gemm</*zero_init=*/true, /*wg_wait=*/-1>(tiled_mma_qk, tSrQ, tK, tS);
+        };
+
+        auto gemm_pv = [&](auto const& tVRS, auto const& tVSS, auto const& tP,
+                           auto& tO, auto zero_init_type) {
+            static constexpr bool ZeroInit = decltype(zero_init_type)::value;
+            flash::gemm<ZeroInit, /*wg_wait=*/-1>(
+                tiled_mma_pv, cute::conditional_return<MmaPV_is_RS>(tP, tOsP),
+                tVRS, tO);
+        };
 
         if constexpr (IntraWGOverlap) {
             Tensor tSrS = partition_fragment_C(tiled_mma_qk, select<0, 1>(TileShape_MNK{}));
             consumer_wait(pipeline_k, smem_pipe_read);
-            flash::gemm</*zero_init=*/true, /*wg_wait=*/-1>(tiled_mma_qk, tSrQ, tSrK(_, _, _, smem_pipe_read.index()), tSrS);
+            gemm_qk(tSrK(_, _, _, smem_pipe_read.index()), tSrS);
             warpgroup_wait<0>();
             pipeline_k.consumer_release(smem_pipe_read);
             if constexpr (HasQv) {
@@ -1261,27 +1700,23 @@ struct CollectiveMainloopFwdSm90 {
             mask.template apply<true /*Seqlenk_mask*/, Is_causal, Is_local>(tSrS, m_block, n_block);
             Tensor scores_scale = softmax.template max_get_scale</*Is_first=*/true, /*Check_inf=*/true>(tSrS);
             // Don't need to store scales to send to WG1 (in the case of LargeHeadDimV) since it's 1.f
-            // softmax.template online_softmax</*Is_first=*/true, /*Check_inf=*/true>(tSrS);
-            softmax.template online_softmax</*Is_first=*/true, /*Check_inf=*/true>(tSrS);
             if constexpr (Is_FP8 && !V_colmajor) { flash::permute_Cregs_fp8(tSrS); }
             Tensor tOrP_acc = make_tensor(tSrS.data(), flash::convert_layout_acc_Aregs<TiledMmaPV>(tSrS.layout()));
             Tensor tOrP = make_tensor_like<Element>(tOrP_acc);
             convert_type_out(tOrP_acc, tOrP);
             if constexpr (Is_FP8 && V_colmajor) { flash::permute_Aregs_fp8(tOrP); }
-            if constexpr (!MmaPV_is_RS) { write_P_to_smem(tOrP); }
-            if constexpr (!MmaPV_is_RS) { arrive_on_P_write_barrier(); }
+            if constexpr (StorePInSmem) { write_P_to_smem(tOrP); }
+            if constexpr (StorePInSmem) { arrive_on_P_write_barrier(); }
             --n_block;
 
             // Need to initialize tOrO in the case of RescaleOBeforeGemm where we will scale tOrO even in the 1st iter
             clear(tOrO);
-            // tiled_mma_pv.accumulate_ = GMMA::ScaleOut::Zero;
 
             // Each step does gemm0 for iter n_block, gemm1 for iter n_block + 1, and softmax for iter n_block.
             auto fwd_step = [&](int const n_block, auto mask_fn, auto check_inf_type) {
                 static constexpr bool Check_inf = decltype(check_inf_type)::value;
                 PipelineState smem_pipe_read_v(smem_pipe_read.index(), smem_pipe_read.phase(), smem_pipe_read.count());
                 ++smem_pipe_read;
-                // Tensor tSrS = partition_fragment_C(tiled_mma_qk, select<0, 1>(TileShape_MNK{}));
                 // CUSTOM consumer wait logic
                 warp_scheduler_barrier_sync();
                 if constexpr (!UseSchedulerBarrier) {
@@ -1300,25 +1735,16 @@ struct CollectiveMainloopFwdSm90 {
                     if (warp_group_idx == 0) { consumer_wait(pipeline_k, smem_pipe_read); }
                     #endif
                 }
-                
-
                 if (!(n_block == n_block_max - 2)) {
-                    // softmax.template online_softmax_reduce_simt</*Is_first=*/false, Check_inf>(tSrS);
-                    // softmax.template online_softmax_reduce_wgmma</*Is_first=*/false, Check_inf>(tSrS, smem_fadd_reduce_B_thrfrg);
                     if (n_block > n_block_max - 5) {
-                        softmax.template online_softmax_reduce_wgmma</*Is_first=*/false, Check_inf>(tSrS, smem_fadd_reduce_B_thrfrg);
+                        softmax.online_softmax_reduce_wgmma(tSrS, smem_fadd_reduce_B_thrfrg);
                     } else {
-                        // softmax.template online_softmax_reduce_wgmma</*Is_first=*/false, Check_inf>(tSrS, smem_fadd_reduce_B_thrfrg);
                         softmax.template online_softmax_reduce_simt</*Is_first=*/false, Check_inf>(tSrS);
-                        // softmax.rescale_o(tOrO, scores_scale);
                     }
                 }
-                
+
                 cute::fill(tSrS, 0.0f);
-                flash::gemm</*zero_init=*/true, /*wg_wait=*/-1>(tiled_mma_qk, tSrQ, tSrK(_, _, _, smem_pipe_read.index()), tSrS);
-                if constexpr (RescaleOBeforeGemm) {
-                    // softmax.rescale_o(tOrO, scores_scale);
-                }
+                gemm_qk(tSrK(_, _, _, smem_pipe_read.index()), tSrS);
                 if constexpr(!HasQv) {
                     // CUSTOM consumer wait logic
                     if constexpr (!UseSchedulerBarrier) {
@@ -1338,7 +1764,9 @@ struct CollectiveMainloopFwdSm90 {
                         #endif
                     }
                 }
-                flash::gemm</*zero_init=*/false, /*wg_wait=*/-1>(tiled_mma_pv, cute::conditional_return<MmaPV_is_RS>(tOrP, tOsP), tOrV(_, _, _, smem_pipe_read_v.index()), tOrO);
+                gemm_pv(tOrV(_, _, _, smem_pipe_read_v.index()),
+                        tOsV(_, _, _, smem_pipe_read_v.index()), tOrP, tOrO,
+                        cute::false_type{});
                 warp_scheduler_barrier_arrive();
                 warpgroup_wait<1>();
                 pipeline_k.consumer_release(smem_pipe_read);  // release K
@@ -1353,8 +1781,7 @@ struct CollectiveMainloopFwdSm90 {
                 cute::copy(softmax.template max_get_scale</*Is_first=*/false, Check_inf>(tSrS), scores_scale);
                 if constexpr (LargeHeadDimV) { store_scales(scores_scale, smem_pipe_read_v.index()); }
                 warpgroup_wait<0>();
-                // softmax.template online_softmax</*Is_first=*/false, Check_inf>(tSrS);
-                softmax.template online_softmax_rescale</*Is_first=*/false, Check_inf>(tSrS);
+                softmax.template online_softmax_rescale<Check_inf>(tSrS);
                 if constexpr (!HasQv) {
                     
                     pipeline_v.consumer_release(smem_pipe_read_v);  // release V
@@ -1362,12 +1789,12 @@ struct CollectiveMainloopFwdSm90 {
                 if constexpr (Is_FP8 && !V_colmajor) { flash::permute_Cregs_fp8(tSrS); }
                 convert_type_out(make_tensor(tSrS.data(), tOrP.layout()), tOrP);
                 if constexpr (Is_FP8 && V_colmajor) { flash::permute_Aregs_fp8(tOrP); }
-                if constexpr (!MmaPV_is_RS) { write_P_to_smem(tOrP); }
+                if constexpr (StorePInSmem) { write_P_to_smem(tOrP); }
                 
                 if constexpr (!RescaleOBeforeGemm) {
                     softmax.rescale_o(tOrO, scores_scale);
                 }
-                if constexpr (!MmaPV_is_RS) { arrive_on_P_write_barrier(); }
+                if constexpr (StorePInSmem) { arrive_on_P_write_barrier(); }
             };
 
             if constexpr (Is_causal || Is_local) { // Separate iterations with causal or local masking
@@ -1401,16 +1828,18 @@ struct CollectiveMainloopFwdSm90 {
             }
 
             if (n_block_max > 1) {
-                // softmax.rescale_o(tOrO, scores_scale);
-                // softmax.template online_softmax_reduce_wgmma</*Is_first=*/false, cute::false_type{}>(tSrS, smem_fadd_reduce_B_thrfrg);
                 softmax.template online_softmax_reduce_simt</*Is_first=*/false, cute::false_type{}>(tSrS);
             }
 
             // Tell producers that smem_q is ready
-            cutlass::arch::NamedBarrier::arrive(NumMmaThreadsQK + (Use_TMA_Q ? cutlass::NumThreadsPerWarp : NumProducerThreads), static_cast<uint32_t>(FwdNamedBarriers::QueryEmpty) /*id*/);
+            if constexpr (HasQSmem) {
+                cutlass::arch::NamedBarrier::arrive(NumMmaThreadsQK + (Use_TMA_Q ? cutlass::NumThreadsPerWarp : NumProducerThreads), static_cast<uint32_t>(FwdNamedBarriers::QueryEmpty) /*id*/);
+            }
             if constexpr (RescaleOBeforeGemm) { softmax.rescale_o(tOrO, scores_scale); }
             if constexpr (!HasQv) { consumer_wait(pipeline_v, smem_pipe_read); }
-            flash::gemm</*zero_init=*/false, /*wg_wait=*/-1>(tiled_mma_pv, cute::conditional_return<MmaPV_is_RS>(tOrP, tOsP), tOrV(_, _, _, smem_pipe_read.index()), tOrO);
+            gemm_pv(tOrV(_, _, _, smem_pipe_read.index()),
+                    tOsV(_, _, _, smem_pipe_read.index()), tOrP, tOrO,
+                    cute::false_type{});
             float const v_descale = !Is_FP8 || params.ptr_v_descale == nullptr ? 1.0f : params.ptr_v_descale[bidb * get<0>(params.stride_v_descale) + bidh_kv * get<1>(params.stride_v_descale)];
             cute::copy(softmax.finalize(v_descale), scores_scale);
             if constexpr (LargeHeadDimV) {
@@ -1435,7 +1864,7 @@ struct CollectiveMainloopFwdSm90 {
                 if constexpr (!Is_first_iter) { ++smem_pipe_read; }
                 Tensor tSrS = partition_fragment_C(tiled_mma_qk, select<0, 1>(TileShape_MNK{}));
                 consumer_wait(pipeline_k, smem_pipe_read);
-                flash::gemm</*zero_init=*/true, /*wg_wait=*/-1>(tiled_mma_qk, tSrQ, tSrK(_, _, _, smem_pipe_read.index()), tSrS);
+                gemm_qk(tSrK(_, _, _, smem_pipe_read.index()), tSrS);
                 if constexpr (!HasQv) {
                     warp_scheduler_barrier_arrive();
                     warpgroup_wait<0>();
@@ -1461,18 +1890,20 @@ struct CollectiveMainloopFwdSm90 {
                 Tensor tOrP = make_tensor_like<Element>(tOrP_acc);
                 convert_type_out(tOrP_acc, tOrP);
                 if constexpr (Is_FP8 && V_colmajor) { flash::permute_Aregs_fp8(tOrP); }
-                if constexpr (!MmaPV_is_RS) { write_P_to_smem(tOrP); }
+                if constexpr (StorePInSmem) { write_P_to_smem(tOrP); }
                 if constexpr (!Is_first_iter) { softmax.rescale_o(tOrO, scores_scale); }
-                if constexpr (!MmaPV_is_RS && !MmaPV_use_RS_WG1) { arrive_on_P_write_barrier(); }
+                if constexpr (StorePInSmem && !MmaPV_use_RS_WG1) { arrive_on_P_write_barrier(); }
                 if constexpr (!HasQv) { consumer_wait(pipeline_v, smem_pipe_read); }
                 warp_scheduler_barrier_sync();
                 if constexpr (!MmaPV_use_RS_WG1) {
-                    flash::gemm</*zero_init=*/Is_first_iter, /*wg_wait=*/-1>(tiled_mma_pv, cute::conditional_return<MmaPV_is_RS>(tOrP, tOsP), tOrV(_, _, _, smem_pipe_read.index()), tOrO);
+                    gemm_pv(tOrV(_, _, _, smem_pipe_read.index()),
+                            tOsV(_, _, _, smem_pipe_read.index()), tOrP, tOrO,
+                            cute::bool_constant<Is_first_iter>{});
                 } else {
                     TiledMmaPV_RS tiled_mma_pv_rs;
                     flash::gemm</*zero_init=*/Is_first_iter, /*wg_wait=*/-1>(tiled_mma_pv_rs, tOrP, tOrV(_, _, _, smem_pipe_read.index()), tOrO);
                 }
-                if constexpr (!MmaPV_is_RS && MmaPV_use_RS_WG1) { arrive_on_P_write_barrier(); }
+                if constexpr (StorePInSmem && MmaPV_use_RS_WG1) { arrive_on_P_write_barrier(); }
                 warpgroup_wait<0>();
                 pipeline_v.consumer_release(smem_pipe_read);  // release V
             };
@@ -1510,7 +1941,9 @@ struct CollectiveMainloopFwdSm90 {
             }
             warp_scheduler_barrier_arrive();
             // Tell producers that smem_q is ready
-            cutlass::arch::NamedBarrier::arrive(NumMmaThreadsQK + (Use_TMA_Q ? cutlass::NumThreadsPerWarp : NumProducerThreads), static_cast<uint32_t>(FwdNamedBarriers::QueryEmpty) /*id*/);
+            if constexpr (HasQSmem) {
+                cutlass::arch::NamedBarrier::arrive(NumMmaThreadsQK + (Use_TMA_Q ? cutlass::NumThreadsPerWarp : NumProducerThreads), static_cast<uint32_t>(FwdNamedBarriers::QueryEmpty) /*id*/);
+            }
             float const v_descale = !Is_FP8 || params.ptr_v_descale == nullptr ? 1.0f : params.ptr_v_descale[bidb * get<0>(params.stride_v_descale) + bidh_kv * get<1>(params.stride_v_descale)];
             Tensor scores_scale = softmax.finalize(v_descale);
             if constexpr (LargeHeadDimV) {
@@ -1525,15 +1958,27 @@ struct CollectiveMainloopFwdSm90 {
         ++work_idx;
         return true;
     }
+#endif  // USE_MMA_SOFTMAX
 
     
-    template <bool ReleaseKV = true, typename SharedStorage, typename FrgTensorO, typename Softmax>
+    template <bool ReleaseKV = true, typename SharedStorage, typename FrgTensorO,
+#if USE_MIX_WGMMA
+              typename FrgTensorQ,
+#endif
+              typename Softmax>
     CUTLASS_DEVICE bool
+#if USE_MIX_WGMMA
+    mma_mix_wgmma(Params const& params,
+#else
     mma(Params const& params,
+#endif
         MainloopPipelineK pipeline_k,
         MainloopPipelineV pipeline_v,
         PipelineState& smem_pipe_read,
         FrgTensorO& tOrO,
+#if USE_MIX_WGMMA
+        FrgTensorQ& tRrQ,
+#endif
         Softmax& softmax,
         int const thread_idx,
         int &work_idx,
@@ -1559,9 +2004,29 @@ struct CollectiveMainloopFwdSm90 {
             if (n_block_max <= n_block_min) { return false; }
         }
 
+#if USE_MIX_WGMMA
+        auto smem_q_ptr = shared_storage.tensors.mainloop.smem_q.data();
+        Tensor sQ = make_tensor(make_smem_ptr(smem_q_ptr), SmemLayoutQ{});
+        Tensor sQ128 = make_tensor(make_smem_ptr(smem_q_ptr + Q128SmemOffset), SmemLayoutQ128{});
+        Tensor sQ64 = make_tensor(make_smem_ptr(smem_q_ptr + Q64SmemOffset), SmemLayoutQ64{});
+        Tensor sQ32 = make_tensor(make_smem_ptr(smem_q_ptr + Q32SmemOffset), SmemLayoutQ32{});
+#else
         Tensor sQ = make_tensor(make_smem_ptr(shared_storage.tensors.mainloop.smem_q.data()), SmemLayoutQ{});
+#endif
         Tensor sK = make_tensor(make_smem_ptr(shared_storage.tensors.mainloop.smem_k.data()), SmemLayoutK{});
         Tensor sV = make_tensor(make_smem_ptr(shared_storage.tensors.mainloop.smem_v.data()), SmemLayoutVtMma{});
+#if USE_MIX_WGMMA
+        auto smem_p_ptr = [&] {
+            if constexpr (HasPSmem) {
+                return shared_storage.tensors.mainloop.smem_p.data();
+            } else {
+                return shared_storage.tensors.mainloop.smem_q.data();
+            }
+        }();
+        Tensor sP128 = make_tensor(make_smem_ptr(smem_p_ptr + P128SmemOffset), SmemLayoutP128{});
+        Tensor sP64 = make_tensor(make_smem_ptr(smem_p_ptr + P64SmemOffset), SmemLayoutP64{});
+        Tensor sP32 = make_tensor(make_smem_ptr(smem_p_ptr + P32SmemOffset), SmemLayoutP32{});
+#else
         Tensor sP = [&] {
             if constexpr (MmaPV_is_RS) {
                 // We might not have smem_p if !MmaPV_is_RS, just use smem_q as a placeholder since we don't use it
@@ -1570,6 +2035,7 @@ struct CollectiveMainloopFwdSm90 {
                 return make_tensor(make_smem_ptr(shared_storage.tensors.mainloop.smem_p.data()), SmemLayoutP{});
             }
         }();
+#endif
         Tensor sScale = [&] {
             if constexpr (LargeHeadDimV) {
                 return make_tensor(make_smem_ptr(shared_storage.tensors.mainloop.smem_scale.data()), SmemLayoutScale{});
@@ -1593,26 +2059,102 @@ struct CollectiveMainloopFwdSm90 {
 
         int warp_group_idx = __shfl_sync(0xFFFFFFFF, thread_idx / cutlass::NumThreadsPerWarpGroup, 0);
         TiledMmaQK tiled_mma_qk;
+#if USE_MIX_WGMMA
+        TiledMmaQKRS tiled_mma_qk_rs;
+#endif
         TiledMmaPV tiled_mma_pv;
+#if USE_MIX_WGMMA
+        TiledMmaPVSS tiled_mma_pv_ss;
+#endif
         TiledMmaQV tiled_mma_qv;
         auto wg_mma_qk = tiled_mma_qk.get_slice(warp_group_thread_layout(warp_group_idx));
+#if USE_MIX_WGMMA
+        auto wg_mma_qk_rs = tiled_mma_qk_rs.get_slice(warp_group_thread_layout(warp_group_idx));
+#endif
         auto wg_mma_pv = tiled_mma_pv.get_slice(warp_group_thread_layout(warp_group_idx));
+        // Register-sourced PV operand A is distributed across individual
+        // threads, unlike the shared-memory descriptors above/below.
+        auto thread_mma_pv = tiled_mma_pv.get_thread_slice(thread_idx);
+#if USE_MIX_WGMMA
+        auto wg_mma_pv_ss = tiled_mma_pv_ss.get_slice(warp_group_thread_layout(warp_group_idx));
+#endif
         auto wg_mma_qv = tiled_mma_qv.get_slice(warp_group_thread_layout(warp_group_idx));
 
+#if USE_MIX_WGMMA
+        SmemTiledCopyP128 smem_tiled_copy_P128;
+        SmemTiledCopyP64 smem_tiled_copy_P64;
+        SmemTiledCopyP32 smem_tiled_copy_P32;
+        auto smem_thr_copy_P128 = smem_tiled_copy_P128.get_thread_slice(thread_idx);
+        auto smem_thr_copy_P64 = smem_tiled_copy_P64.get_thread_slice(thread_idx);
+        auto smem_thr_copy_P32 = smem_tiled_copy_P32.get_thread_slice(thread_idx);
+#else
         auto smem_tiled_copy_P = make_tiled_copy_C(SmemCopyAtomP{}, tiled_mma_qk);
         auto smem_thr_copy_P = smem_tiled_copy_P.get_thread_slice(thread_idx);
+#endif
 
         // Allocate "fragments/descriptors"
         Tensor tSrQ = wg_mma_qk.partition_fragment_A(sQ);
+#if USE_MIX_WGMMA
+        Tensor tSsQ128 = wg_mma_qk.partition_fragment_A(sQ128);
+        Tensor tSsQ64 = wg_mma_qk.partition_fragment_A(sQ64);
+        Tensor tSsQ32 = wg_mma_qk.partition_fragment_A(sQ32);
+#endif
         Tensor tSrK = wg_mma_qk.partition_fragment_B(sK);
         Tensor tOrV = wg_mma_pv.partition_fragment_B(sV);
+#if USE_MIX_WGMMA
+        Tensor tOsV = wg_mma_pv_ss.partition_fragment_B(sV);
+        Tensor tOsP128 = wg_mma_pv_ss.partition_fragment_A(sP128);
+        Tensor tOsP64 = wg_mma_pv_ss.partition_fragment_A(sP64);
+        Tensor tOsP32 = wg_mma_pv_ss.partition_fragment_A(sP32);
+        Tensor gPRegPlaceholder = make_tensor(
+            make_gmem_ptr(static_cast<Element const*>(nullptr)),
+            make_layout(Shape<Int<kBlockM>, Int<PRegColsSafe>>{},
+                        Stride<Int<kBlockN>, _1>{}));
+        Tensor tOrPRegPlaceholder = thread_mma_pv.partition_fragment_A(gPRegPlaceholder);
+        Tensor gPOneTilePlaceholder = make_tensor(
+            make_gmem_ptr(static_cast<Element const*>(nullptr)),
+            make_layout(Shape<Int<kBlockM>, Int<MmaK>>{},
+                        Stride<Int<kBlockN>, _1>{}));
+        Tensor tOrPOneTilePlaceholder = thread_mma_pv.partition_fragment_A(gPOneTilePlaceholder);
+        Tensor cPOneTile = cute::make_identity_tensor(
+            Shape<Int<kBlockM>, Int<MmaK>>{});
+        Tensor tOcPOneTile = thread_mma_pv.partition_A(cPOneTile);
+#else
+        Tensor tOsV = tOrV;
         Tensor tOsP = wg_mma_pv.partition_fragment_A(sP);
+#endif
         Tensor tSrQv = wg_mma_qv.partition_fragment_A(sQv);
         Tensor tSrV = wg_mma_qv.partition_fragment_B(sVMmaQV);
+#if USE_MIX_WGMMA
+        Tensor tPsP128 = [&] {
+            auto sP = cute::as_position_independent_swizzle_tensor(sP128);
+            if constexpr (Is_FP8) {
+                return smem_thr_copy_P128.partition_D(recast<uint16_t>(sP));
+            } else {
+                return smem_thr_copy_P128.partition_D(sP);
+            }
+        }();
+        Tensor tPsP64 = [&] {
+            auto sP = cute::as_position_independent_swizzle_tensor(sP64);
+            if constexpr (Is_FP8) {
+                return smem_thr_copy_P64.partition_D(recast<uint16_t>(sP));
+            } else {
+                return smem_thr_copy_P64.partition_D(sP);
+            }
+        }();
+        Tensor tPsP32 = [&] {
+            auto sP = cute::as_position_independent_swizzle_tensor(sP32);
+            if constexpr (Is_FP8) {
+                return smem_thr_copy_P32.partition_D(recast<uint16_t>(sP));
+            } else {
+                return smem_thr_copy_P32.partition_D(sP);
+            }
+        }();
+#else
         Tensor tPsP = smem_thr_copy_P.partition_D(cute::as_position_independent_swizzle_tensor(sP));
+#endif
 
         // For storing scales to smem, only used when LargeHeadDimV
-        auto thread_mma_pv = tiled_mma_pv.get_thread_slice(thread_idx);
         Tensor taccOcO = thread_mma_pv.partition_C(cute::make_identity_tensor(select<0, 1>(TileShape_MNK_PV{})));
         Tensor taccOcO_rowcol = make_tensor(taccOcO.data(), flash::convert_layout_acc_rowcol(taccOcO.layout()));
         Tensor taccOcO_row = taccOcO_rowcol(_, _0{});
@@ -1630,14 +2172,8 @@ struct CollectiveMainloopFwdSm90 {
             auto barrier_token = pipeline.consumer_try_wait(smem_pipe_read);
             pipeline.consumer_wait(smem_pipe_read, barrier_token);
         };
-        // CUSTOM NOTE: these two are real seqlen
         int const seqlen_q = seqlen_info.seqlen_q;
         int const seqlen_k = seqlen_info.seqlen_k;
-        ////// CUSTOM DEBUG //////
-        // if (cute::thread(128, 0)){
-        //     printf("seqlen_q = %d, seqlen_k = %d\n", seqlen_q, seqlen_k);
-        // }
-        ////// CUSTOM DEBUG //////
         int n_block = n_block_max - 1;
 
         flash::Mask<kBlockM, kBlockN, PackGQA, TiledMmaQK> mask(
@@ -1661,21 +2197,163 @@ struct CollectiveMainloopFwdSm90 {
             if constexpr (LargeHeadDimV) {
                 cutlass::arch::NamedBarrier::sync(NumMmaThreads, static_cast<uint32_t>(FwdNamedBarriers::PEmpty) /*id*/);
             }
+#if USE_MIX_WGMMA
+            if constexpr (HasPSmem) {
+                Tensor tPrP128 = smem_thr_copy_P128.retile_S(tOrP);
+                Tensor tPrP64 = smem_thr_copy_P64.retile_S(tOrP);
+                Tensor tPrP32 = smem_thr_copy_P32.retile_S(tOrP);
+                constexpr int P128CopyTiles = HasP128 ? CUTE_STATIC_V(size<2>(tPsP128)) : 0;
+                if constexpr (HasP128) {
+                    CUTLASS_PRAGMA_UNROLL
+                    for (int n = 0; n < P128CopyTiles; ++n) {
+                        cute::copy(smem_tiled_copy_P128, tPrP128(_, _, n), tPsP128(_, _, n));
+                    }
+                }
+                if constexpr (HasP64) {
+                    constexpr int P64CopyTiles = CUTE_STATIC_V(size<2>(tPsP64));
+                    CUTLASS_PRAGMA_UNROLL
+                    for (int n = 0; n < P64CopyTiles; ++n) {
+                        cute::copy(smem_tiled_copy_P64, tPrP64(_, _, P128CopyTiles + n), tPsP64(_, _, n));
+                    }
+                }
+                if constexpr (HasP32) {
+                    constexpr int P64CopyTiles = HasP64 ? CUTE_STATIC_V(size<2>(tPsP64)) : 0;
+                    constexpr int P32CopyTiles = CUTE_STATIC_V(size<2>(tPsP32));
+                    CUTLASS_PRAGMA_UNROLL
+                    for (int n = 0; n < P32CopyTiles; ++n) {
+                        cute::copy(smem_tiled_copy_P32, tPrP32(_, _, P128CopyTiles + P64CopyTiles + n), tPsP32(_, _, n));
+                    }
+                }
+            }
+#else
             cute::copy(smem_tiled_copy_P, smem_thr_copy_P.retile_S(tOrP), tPsP);
+#endif
         };
+
+#if USE_MIX_WGMMA
+        // Avoid materializing a full low-precision P fragment. Convert each
+        // SMEM-prefix tile into a short-lived fragment and immediately store
+        // it. Convert the compact register suffix separately so its lifetime
+        // does not overlap the FP32 row-sum reduction.
+        // For FP8 non-V-colmajor, tSrS has already received the C-register
+        // permutation. For FP8 V-colmajor, each converted A tile is permuted
+        // independently before it is stored or retained.
+        auto convert_store_P_smem_prefix = [&](auto& tSrS) {
+            Tensor tOrPAcc = make_tensor(
+                tSrS.data(), flash::convert_layout_acc_Aregs<TiledMmaPV>(tSrS.layout()));
+            // Keep the MMA-K mode (with extent 1) so STSM's retile_S sees the
+            // same rank-3 fragment shape as the normal full-P path. This one
+            // temporary is overwritten for every SMEM-prefix tile.
+            Tensor tOrPStoreTile = make_tensor_like<Element>(tOrPOneTilePlaceholder);
+            static_assert(CUTE_STATIC_V(size(tOrPStoreTile)) ==
+                          CUTE_STATIC_V(size(tOcPOneTile)));
+
+            auto convert_store_region = [&](auto const& smem_tiled_copy,
+                                            auto const& smem_thr_copy,
+                                            auto& tPsPRegion,
+                                            auto start_tile,
+                                            auto tile_count) {
+                constexpr int StartTile = decltype(start_tile)::value;
+                constexpr int TileCount = decltype(tile_count)::value;
+                cute::for_each(cute::make_int_sequence<TileCount>{}, [&](auto tile_idx) {
+                    constexpr int SrcTile = StartTile + decltype(tile_idx)::value;
+                    Tensor tOrPAccSlice = tOrPAcc(_, _, Int<SrcTile>{});
+                    Tensor tOrPAccTile = make_tensor(tOrPAccSlice.data(), tOrPStoreTile.layout());
+                    convert_type_out(tOrPAccTile, tOrPStoreTile);
+                    if constexpr (Is_FP8 && V_colmajor) {
+                        flash::permute_Aregs_fp8(tOrPStoreTile);
+                    }
+                    // Keep the original vectorized STSM mapping for each
+                    // short-lived prefix tile. FP8 byte/lane ordering has
+                    // already been established by convert_layout_acc_Aregs
+                    // and the optional permute_Aregs_fp8 above; only its copy
+                    // view is packed into b16 cells here.
+                    if constexpr (Is_FP8) {
+                        Tensor tPrPTile = smem_thr_copy.retile_S(
+                            recast<uint16_t>(tOrPStoreTile));
+                        cute::copy(smem_tiled_copy, tPrPTile(_, _, _0{}),
+                                   tPsPRegion(_, _, tile_idx));
+                    } else {
+                        Tensor tPrPTile = smem_thr_copy.retile_S(tOrPStoreTile);
+                        cute::copy(smem_tiled_copy, tPrPTile(_, _, _0{}),
+                                   tPsPRegion(_, _, tile_idx));
+                    }
+                });
+            };
+
+            if constexpr (HasP128) {
+                constexpr int TileCount = CUTE_STATIC_V(size<2>(tPsP128));
+                convert_store_region(smem_tiled_copy_P128, smem_thr_copy_P128, tPsP128,
+                                     Int<0>{}, Int<TileCount>{});
+            }
+            if constexpr (HasP64) {
+                constexpr int StartTile = P128KTiles;
+                constexpr int TileCount = CUTE_STATIC_V(size<2>(tPsP64));
+                convert_store_region(smem_tiled_copy_P64, smem_thr_copy_P64, tPsP64,
+                                     Int<StartTile>{}, Int<TileCount>{});
+            }
+            if constexpr (HasP32) {
+                constexpr int StartTile = P128KTiles + P64KTiles;
+                constexpr int TileCount = CUTE_STATIC_V(size<2>(tPsP32));
+                convert_store_region(smem_tiled_copy_P32, smem_thr_copy_P32, tPsP32,
+                                     Int<StartTile>{}, Int<TileCount>{});
+            }
+        };
+
+        auto convert_P_reg_suffix = [&](auto& tSrS, auto& tOrPReg) {
+            if constexpr (HasPReg) {
+                Tensor tOrPAcc = make_tensor(
+                    tSrS.data(), flash::convert_layout_acc_Aregs<TiledMmaPV>(tSrS.layout()));
+                cute::for_each(cute::make_int_sequence<PRegKTiles>{}, [&](auto reg_tile) {
+                    constexpr int SrcTile = PSmemKTiles + decltype(reg_tile)::value;
+                    Tensor tOrPAccTile = tOrPAcc(_, _, Int<SrcTile>{});
+                    Tensor tOrPRegTile = tOrPReg(_, _, reg_tile);
+                    convert_type_out(tOrPAccTile, tOrPRegTile);
+                    if constexpr (Is_FP8 && V_colmajor) {
+                        flash::permute_Aregs_fp8(tOrPRegTile);
+                    }
+                });
+            }
+        };
+#endif
+
+#if USE_MIX_WGMMA
+        // Start the SMEM-prefix stores as soon as exp(P) is available, then
+        // accumulate row_sum, and only afterwards materialize the persistent
+        // register suffix. FP8 non-V-colmajor is the exception:
+        // permute_Cregs_fp8 changes the accumulator arrangement, so its
+        // reduction must finish before either conversion step.
+        auto softmax_store_reduce = [&](auto& tSrS, auto& tOrP,
+                                        auto is_first_type) {
+            constexpr bool Is_first = decltype(is_first_type)::value;
+            if constexpr (Is_FP8 && !V_colmajor) {
+                softmax.template online_softmax_reduce<Is_first>(tSrS);
+                flash::permute_Cregs_fp8(tSrS);
+                convert_store_P_smem_prefix(tSrS);
+                convert_P_reg_suffix(tSrS, tOrP);
+            } else {
+                convert_store_P_smem_prefix(tSrS);
+                softmax.template online_softmax_reduce<Is_first>(tSrS);
+                convert_P_reg_suffix(tSrS, tOrP);
+            }
+        };
+#endif
 
         auto arrive_on_P_write_barrier = [&] {
             cutlass::arch::fence_view_async_shared();
+#if !USE_MIX_WGMMA
             __syncwarp();  // Only need syncwarp since each warp is using its own P values for MmaPV
+#endif
             if constexpr (LargeHeadDimV) {
                 cutlass::arch::NamedBarrier::arrive(NumMmaThreads, static_cast<uint32_t>(FwdNamedBarriers::PFull) /*id*/);
             }
         };
 
         auto &barrier_Q = shared_storage.pipelines.barrier_Q;
-        if constexpr (!AppendKV) {
-            barrier_Q.wait(work_idx % 2);
-        } else {
+        if constexpr (HasQSmem) {
+          if constexpr (!AppendKV) {
+              barrier_Q.wait(work_idx % 2);
+          } else {
             if (get<1>(params.shape_rotary) > 0) {  // Apply rotary to Q
                 using Rotary_t = Rotary<kBlockM, kHeadDim, NumMmaThreadsQK, Element, !(Is_causal || Is_local) /*FixedPosition*/>;
                 Rotary_t rotary(params.ptr_rotary_cos, params.shape_rotary, params.stride_rotary_cos,
@@ -1705,6 +2383,7 @@ struct CollectiveMainloopFwdSm90 {
             } else {
                 barrier_Q.wait(work_idx % 2);
             }
+          }
         }
 
         if constexpr (MmaQK_is_RS) {
@@ -1715,11 +2394,47 @@ struct CollectiveMainloopFwdSm90 {
             Tensor tSsQ_copy_view = smem_thr_copy_Q.partition_S(cute::as_position_independent_swizzle_tensor(sQ));
             cute::copy(smem_tiled_copy_Q, tSsQ_copy_view, tSrQ_copy_view);
         }
+#if USE_MIX_WGMMA
+        auto gemm_qk = [&](auto const& tK, auto& tS) {
+            if constexpr (!HasQReg) {
+                flash::gemm</*zero_init=*/true, /*wg_wait=*/-1>(tiled_mma_qk, tSrQ, tK, tS);
+            } else {
+                flash::gemmQK<HasQ128, HasQ64, HasQ32, HasQReg, /*zero_init=*/true, /*wg_wait=*/-1>(
+                    tiled_mma_qk, tiled_mma_qk_rs,
+                    tSsQ128, tSsQ64, tSsQ32, tRrQ, tK, tS);
+            }
+        };
+#else
+        auto gemm_qk = [&](auto const& tK, auto& tS) {
+            flash::gemm</*zero_init=*/true, /*wg_wait=*/-1>(tiled_mma_qk, tSrQ, tK, tS);
+        };
+#endif
+
+        auto gemm_pv = [&](auto const& tVRS, auto const& tVSS, auto const& tP,
+                           auto& tO, auto zero_init_type) {
+            static constexpr bool ZeroInit = decltype(zero_init_type)::value;
+#if USE_MIX_WGMMA
+            if constexpr (!HasPSmem) {
+                flash::gemm<ZeroInit, /*wg_wait=*/-1>(tiled_mma_pv, tP, tVRS, tO);
+            } else {
+                __syncwarp();
+                flash::gemmPV<HasP128, HasP64, HasP32, HasPReg,
+                              /*PRegIsCompact=*/true,
+                              ZeroInit, /*wg_wait=*/-1>(
+                    tiled_mma_pv_ss, tiled_mma_pv,
+                    tOsP128, tOsP64, tOsP32, tP, tVSS, tO);
+            }
+#else
+            flash::gemm<ZeroInit, /*wg_wait=*/-1>(
+                tiled_mma_pv, cute::conditional_return<MmaPV_is_RS>(tP, tOsP),
+                tVRS, tO);
+#endif
+        };
 
         if constexpr (IntraWGOverlap) {
             Tensor tSrS = partition_fragment_C(tiled_mma_qk, select<0, 1>(TileShape_MNK{}));
             consumer_wait(pipeline_k, smem_pipe_read);
-            flash::gemm</*zero_init=*/true, /*wg_wait=*/-1>(tiled_mma_qk, tSrQ, tSrK(_, _, _, smem_pipe_read.index()), tSrS);
+            gemm_qk(tSrK(_, _, _, smem_pipe_read.index()), tSrS);
             warpgroup_wait<0>();
             pipeline_k.consumer_release(smem_pipe_read);
             if constexpr (HasQv) {
@@ -1732,14 +2447,33 @@ struct CollectiveMainloopFwdSm90 {
             Tensor scores_scale = softmax.template max_get_scale</*Is_first=*/true, /*Check_inf=*/true>(tSrS);
             // Don't need to store scales to send to WG1 (in the case of LargeHeadDimV) since it's 1.f
 
+            Tensor tOrP_acc = make_tensor(tSrS.data(), flash::convert_layout_acc_Aregs<TiledMmaPV>(tSrS.layout()));
+#if USE_MIX_WGMMA
+            Tensor tOrP = [&] {
+                if constexpr (HasPSmem) {
+                    return make_tensor_like<Element>(tOrPRegPlaceholder);
+                } else {
+                    return make_tensor_like<Element>(tOrP_acc);
+                }
+            }();
+            if constexpr (HasPSmem) {
+                softmax.template online_softmax_exp</*Check_inf=*/true>(tSrS);
+                softmax_store_reduce(tSrS, tOrP, cute::true_type{});
+            } else {
+                softmax.template online_softmax</*Is_first=*/true, /*Check_inf=*/true>(tSrS);
+                if constexpr (Is_FP8 && !V_colmajor) { flash::permute_Cregs_fp8(tSrS); }
+                convert_type_out(tOrP_acc, tOrP);
+                if constexpr (Is_FP8 && V_colmajor) { flash::permute_Aregs_fp8(tOrP); }
+            }
+#else
+            Tensor tOrP = make_tensor_like<Element>(tOrP_acc);
             softmax.template online_softmax</*Is_first=*/true, /*Check_inf=*/true>(tSrS);
             if constexpr (Is_FP8 && !V_colmajor) { flash::permute_Cregs_fp8(tSrS); }
-            Tensor tOrP_acc = make_tensor(tSrS.data(), flash::convert_layout_acc_Aregs<TiledMmaPV>(tSrS.layout()));
-            Tensor tOrP = make_tensor_like<Element>(tOrP_acc);
             convert_type_out(tOrP_acc, tOrP);
             if constexpr (Is_FP8 && V_colmajor) { flash::permute_Aregs_fp8(tOrP); }
-            if constexpr (!MmaPV_is_RS) { write_P_to_smem(tOrP); }
-            if constexpr (!MmaPV_is_RS) { arrive_on_P_write_barrier(); }
+            if constexpr (StorePInSmem) { write_P_to_smem(tOrP); }
+#endif
+            if constexpr (StorePInSmem) { arrive_on_P_write_barrier(); }
             --n_block;
 
             // Need to initialize tOrO in the case of RescaleOBeforeGemm where we will scale tOrO even in the 1st iter
@@ -1754,14 +2488,16 @@ struct CollectiveMainloopFwdSm90 {
                 Tensor tSrS = partition_fragment_C(tiled_mma_qk, select<0, 1>(TileShape_MNK{}));
                 if (!UseSchedulerBarrier || warp_group_idx == 0) { consumer_wait(pipeline_k, smem_pipe_read); }
                 warp_scheduler_barrier_sync();
-                flash::gemm</*zero_init=*/true, /*wg_wait=*/-1>(tiled_mma_qk, tSrQ, tSrK(_, _, _, smem_pipe_read.index()), tSrS);
+                gemm_qk(tSrK(_, _, _, smem_pipe_read.index()), tSrS);
                 if constexpr (RescaleOBeforeGemm) {
                     softmax.rescale_o(tOrO, scores_scale);
                 }
                 if constexpr(!HasQv) {
                     if (!UseSchedulerBarrier || warp_group_idx == 0) { consumer_wait(pipeline_v, smem_pipe_read_v); }
                 }
-                flash::gemm</*zero_init=*/false, /*wg_wait=*/-1>(tiled_mma_pv, cute::conditional_return<MmaPV_is_RS>(tOrP, tOsP), tOrV(_, _, _, smem_pipe_read_v.index()), tOrO);
+                gemm_pv(tOrV(_, _, _, smem_pipe_read_v.index()),
+                        tOsV(_, _, _, smem_pipe_read_v.index()), tOrP, tOrO,
+                        cute::false_type{});
                 warp_scheduler_barrier_arrive();
                 warpgroup_wait<1>();
                 pipeline_k.consumer_release(smem_pipe_read);  // release K
@@ -1775,19 +2511,40 @@ struct CollectiveMainloopFwdSm90 {
                 mask_fn(tSrS, n_block);
                 cute::copy(softmax.template max_get_scale</*Is_first=*/false, Check_inf>(tSrS), scores_scale);
                 if constexpr (LargeHeadDimV) { store_scales(scores_scale, smem_pipe_read_v.index()); }
+#if USE_MIX_WGMMA
+                if constexpr (HasPSmem) {
+                    softmax.template online_softmax_exp<Check_inf>(tSrS);
+                } else {
+                    softmax.template online_softmax</*Is_first=*/false, Check_inf>(tSrS);
+                }
+#else
                 softmax.template online_softmax</*Is_first=*/false, Check_inf>(tSrS);
+#endif
                 if constexpr (!HasQv) {
                     warpgroup_wait<0>();
                     pipeline_v.consumer_release(smem_pipe_read_v);  // release V
                 }
+#if USE_MIX_WGMMA
+                if constexpr (HasPSmem) {
+                    // The previous PV uses tOrP and smemP asynchronously.  Reuse
+                    // them only after wait<0>, then overlap STSM with reduce_sum.
+                    softmax_store_reduce(tSrS, tOrP, cute::false_type{});
+                } else {
+                    if constexpr (Is_FP8 && !V_colmajor) { flash::permute_Cregs_fp8(tSrS); }
+                    convert_type_out(make_tensor(tSrS.data(), tOrP.layout()), tOrP);
+                    if constexpr (Is_FP8 && V_colmajor) { flash::permute_Aregs_fp8(tOrP); }
+                }
+#endif
+#if !USE_MIX_WGMMA
                 if constexpr (Is_FP8 && !V_colmajor) { flash::permute_Cregs_fp8(tSrS); }
                 convert_type_out(make_tensor(tSrS.data(), tOrP.layout()), tOrP);
                 if constexpr (Is_FP8 && V_colmajor) { flash::permute_Aregs_fp8(tOrP); }
-                if constexpr (!MmaPV_is_RS) { write_P_to_smem(tOrP); }
+                if constexpr (StorePInSmem) { write_P_to_smem(tOrP); }
+#endif
                 if constexpr (!RescaleOBeforeGemm) {
                     softmax.rescale_o(tOrO, scores_scale);
                 }
-                if constexpr (!MmaPV_is_RS) { arrive_on_P_write_barrier(); }
+                if constexpr (StorePInSmem) { arrive_on_P_write_barrier(); }
             };
 
             if constexpr (Is_causal || Is_local) { // Separate iterations with causal or local masking
@@ -1820,10 +2577,14 @@ struct CollectiveMainloopFwdSm90 {
                 }
             }
             // Tell producers that smem_q is ready
-            cutlass::arch::NamedBarrier::arrive(NumMmaThreadsQK + (Use_TMA_Q ? cutlass::NumThreadsPerWarp : NumProducerThreads), static_cast<uint32_t>(FwdNamedBarriers::QueryEmpty) /*id*/);
+            if constexpr (HasQSmem) {
+                cutlass::arch::NamedBarrier::arrive(NumMmaThreadsQK + (Use_TMA_Q ? cutlass::NumThreadsPerWarp : NumProducerThreads), static_cast<uint32_t>(FwdNamedBarriers::QueryEmpty) /*id*/);
+            }
             if constexpr (RescaleOBeforeGemm) { softmax.rescale_o(tOrO, scores_scale); }
             if constexpr (!HasQv) { consumer_wait(pipeline_v, smem_pipe_read); }
-            flash::gemm</*zero_init=*/false, /*wg_wait=*/-1>(tiled_mma_pv, cute::conditional_return<MmaPV_is_RS>(tOrP, tOsP), tOrV(_, _, _, smem_pipe_read.index()), tOrO);
+            gemm_pv(tOrV(_, _, _, smem_pipe_read.index()),
+                    tOsV(_, _, _, smem_pipe_read.index()), tOrP, tOrO,
+                    cute::false_type{});
             float const v_descale = !Is_FP8 || params.ptr_v_descale == nullptr ? 1.0f : params.ptr_v_descale[bidb * get<0>(params.stride_v_descale) + bidh_kv * get<1>(params.stride_v_descale)];
             cute::copy(softmax.finalize(v_descale), scores_scale);
             if constexpr (LargeHeadDimV) {
@@ -1837,6 +2598,9 @@ struct CollectiveMainloopFwdSm90 {
             if constexpr (Is_FP8 && !V_colmajor) { flash::permute_output_fp8(tOrO); }
             ++smem_pipe_read;
 
+#if USE_MIX_WGMMA
+        }
+#else
         } else {  // No intra-WG overlap
 
             warp_scheduler_barrier_sync();
@@ -1848,7 +2612,7 @@ struct CollectiveMainloopFwdSm90 {
                 if constexpr (!Is_first_iter) { ++smem_pipe_read; }
                 Tensor tSrS = partition_fragment_C(tiled_mma_qk, select<0, 1>(TileShape_MNK{}));
                 consumer_wait(pipeline_k, smem_pipe_read);
-                flash::gemm</*zero_init=*/true, /*wg_wait=*/-1>(tiled_mma_qk, tSrQ, tSrK(_, _, _, smem_pipe_read.index()), tSrS);
+                gemm_qk(tSrK(_, _, _, smem_pipe_read.index()), tSrS);
                 if constexpr (!HasQv) {
                     warp_scheduler_barrier_arrive();
                     warpgroup_wait<0>();
@@ -1868,24 +2632,38 @@ struct CollectiveMainloopFwdSm90 {
                 mask_fn(tSrS, n_block);
                 Tensor scores_scale = softmax.template max_get_scale</*Is_first=*/Is_first_iter, Check_inf>(tSrS);
                 if constexpr (LargeHeadDimV && !Is_first_iter) { store_scales(scores_scale, smem_pipe_read_prev.index()); }
-                softmax.template online_softmax</*Is_first=*/Is_first_iter, Check_inf>(tSrS);
-                if constexpr (Is_FP8 && !V_colmajor) { flash::permute_Cregs_fp8(tSrS); }
                 Tensor tOrP_acc = make_tensor(tSrS.data(), flash::convert_layout_acc_Aregs<TiledMmaPV>(tSrS.layout()));
                 Tensor tOrP = make_tensor_like<Element>(tOrP_acc);
+#if USE_MIX_WGMMA
+                if constexpr (HasPSmem) {
+                    softmax.template online_softmax_exp<Check_inf>(tSrS);
+                    softmax_store_reduce(tSrS, tOrP, is_first_iter_type);
+                } else {
+                    softmax.template online_softmax</*Is_first=*/Is_first_iter, Check_inf>(tSrS);
+                    if constexpr (Is_FP8 && !V_colmajor) { flash::permute_Cregs_fp8(tSrS); }
+                    convert_type_out(tOrP_acc, tOrP);
+                    if constexpr (Is_FP8 && V_colmajor) { flash::permute_Aregs_fp8(tOrP); }
+                }
+#else
+                softmax.template online_softmax</*Is_first=*/Is_first_iter, Check_inf>(tSrS);
+                if constexpr (Is_FP8 && !V_colmajor) { flash::permute_Cregs_fp8(tSrS); }
                 convert_type_out(tOrP_acc, tOrP);
                 if constexpr (Is_FP8 && V_colmajor) { flash::permute_Aregs_fp8(tOrP); }
-                if constexpr (!MmaPV_is_RS) { write_P_to_smem(tOrP); }
+                if constexpr (StorePInSmem) { write_P_to_smem(tOrP); }
+#endif
                 if constexpr (!Is_first_iter) { softmax.rescale_o(tOrO, scores_scale); }
-                if constexpr (!MmaPV_is_RS && !MmaPV_use_RS_WG1) { arrive_on_P_write_barrier(); }
+                if constexpr (StorePInSmem && !MmaPV_use_RS_WG1) { arrive_on_P_write_barrier(); }
                 if constexpr (!HasQv) { consumer_wait(pipeline_v, smem_pipe_read); }
                 warp_scheduler_barrier_sync();
                 if constexpr (!MmaPV_use_RS_WG1) {
-                    flash::gemm</*zero_init=*/Is_first_iter, /*wg_wait=*/-1>(tiled_mma_pv, cute::conditional_return<MmaPV_is_RS>(tOrP, tOsP), tOrV(_, _, _, smem_pipe_read.index()), tOrO);
+                    gemm_pv(tOrV(_, _, _, smem_pipe_read.index()),
+                            tOsV(_, _, _, smem_pipe_read.index()), tOrP, tOrO,
+                            cute::bool_constant<Is_first_iter>{});
                 } else {
                     TiledMmaPV_RS tiled_mma_pv_rs;
                     flash::gemm</*zero_init=*/Is_first_iter, /*wg_wait=*/-1>(tiled_mma_pv_rs, tOrP, tOrV(_, _, _, smem_pipe_read.index()), tOrO);
                 }
-                if constexpr (!MmaPV_is_RS && MmaPV_use_RS_WG1) { arrive_on_P_write_barrier(); }
+                if constexpr (StorePInSmem && MmaPV_use_RS_WG1) { arrive_on_P_write_barrier(); }
                 warpgroup_wait<0>();
                 if constexpr (ReleaseKV) { pipeline_v.consumer_release(smem_pipe_read); }  // release V
             };
@@ -1935,6 +2713,7 @@ struct CollectiveMainloopFwdSm90 {
             if constexpr (Is_FP8 && !V_colmajor) { flash::permute_output_fp8(tOrO); }
             ++smem_pipe_read;
         }
+#endif  // USE_MIX_WGMMA
         ++work_idx;
         return true;
     }
@@ -2111,23 +2890,17 @@ struct CollectiveMainloopFwdSm90 {
         // have finished reading all smem_k and smem_v for the previous iteration.
         shared_storage.pipelines.barrier_O.wait((work_idx + 1) % 2);
         if (should_load_KV) { load_K_new(n_block, smem_pipe_write); }
-        // if (thread_idx == 0) { printf("Producer: Done loading K, n_block = %d, n_block_new_min = %d\n", n_block, n_block_new_min); }
         if (should_load_KV) { load_V_new(n_block, smem_pipe_write); }
-        // if (thread_idx == 0) { printf("Producer: Done loading V, n_block = %d, n_block_new_min = %d\n", n_block, n_block_new_min); }
         ++smem_pipe_write;
         --n_block;
-        // if (thread_idx == 0) { printf("Producer: before for loop\n"); }
         #pragma unroll 1
         for (; n_block >= n_block_new_min; --n_block) {
             if (should_load_KV) {
                 load_K_new(n_block, smem_pipe_write);
-                // if (thread_idx == 0) { printf("Producer: Done loading K, n_block = %d, n_block_new_min = %d\n", n_block, n_block_new_min); }
                 load_V_new(n_block, smem_pipe_write);
-                // if (thread_idx == 0) { printf("Producer: Done loading V, n_block = %d, n_block_new_min = %d\n", n_block, n_block_new_min); }
             }
             ++smem_pipe_write;
         }
-        // if (thread_idx == 0) { printf("Producer: after for loop\n"); }
         // At the end, all threads have the correct smem_pipe_write.
         return true;
     }
@@ -2195,10 +2968,19 @@ struct CollectiveMainloopFwdSm90 {
         );
 
         if constexpr (UseSchedulerBarrier) {
-            // WG1 already got the very first signal from mma_init(), but we'll be using the same NamedBarrier.
-            // So we'll need to "cancel it out" here and then re-signal it at the end.
-            if (flash::canonical_warp_group_idx_nosync() == 1) {
-                cutlass::arch::NamedBarrier::sync(2 * cutlass::NumThreadsPerWarpGroup, static_cast<uint32_t>(FwdNamedBarriers::WarpSchedulerWG1) /*id*/);
+            // mma_init() seeded the first scheduler token. AppendKV temporarily
+            // reuses the per-WG barriers, so consume that token here and restore
+            // it at the end. The inverse ring starts at the last consumer WG.
+#if USE_INVERSE_WGSYNC
+            constexpr int SchedulerFirstWG = NumMmaWarpGroups;
+#else
+            constexpr int SchedulerFirstWG = 1;
+#endif
+            if (flash::canonical_warp_group_idx_nosync() == SchedulerFirstWG) {
+                cutlass::arch::NamedBarrier::sync(
+                    2 * cutlass::NumThreadsPerWarpGroup,
+                    static_cast<uint32_t>(FwdNamedBarriers::WarpSchedulerWG1)
+                        + SchedulerFirstWG - 1 /*id*/);
             }
         }
 
@@ -2255,7 +3037,6 @@ struct CollectiveMainloopFwdSm90 {
             // before calling.
             cutlass::arch::NamedBarrier::sync(cutlass::NumThreadsPerWarpGroup, static_cast<uint32_t>(FwdNamedBarriers::WarpSchedulerWG1) - 1 + flash::canonical_warp_group_idx_nosync() /*id*/);
             pipeline_k_new.consumer_release(smem_pipe_read);
-            // if (thread_idx == 0) { print_tensor(tKpK); printf("\n"); printf("seqlen_limit = %d\n", seqlen_k_new - n_block * kBlockN);}
         };
 
         auto store_V = [&] (int const n_block, auto const& smem_pipe_read) {
@@ -2279,17 +3060,22 @@ struct CollectiveMainloopFwdSm90 {
         for (int n_block = n_block_new_max - 1; n_block >= n_block_new_min; --n_block) {
             if constexpr (PagedKVNonTMA) { paged_kv_manager.template load_page_table<true /*Seqlenk_mask*/>(n_block); }
             store_K(n_block, smem_pipe_read);
-            // if (thread_idx == 0) { printf("Done storing K, n_block = %d, n_block_new_min = %d\n", n_block, n_block_new_min); }
             store_V(n_block, smem_pipe_read);
-            // if (thread_idx == 0) { printf("Done storing V, n_block = %d, n_block_new_min = %d\n", n_block, n_block_new_min); }
             ++smem_pipe_read;
         }
-        // if (thread_idx == 0) { printf("After for loop\n"); }
 
         // Re-signaling the NamedBarrier that we "canceled out"
         if constexpr (UseSchedulerBarrier) {
-            if (flash::canonical_warp_group_idx_nosync() == 1) {
-                cutlass::arch::NamedBarrier::arrive(2 * cutlass::NumThreadsPerWarpGroup, static_cast<uint32_t>(FwdNamedBarriers::WarpSchedulerWG1) /*id*/);
+#if USE_INVERSE_WGSYNC
+            constexpr int SchedulerFirstWG = NumMmaWarpGroups;
+#else
+            constexpr int SchedulerFirstWG = 1;
+#endif
+            if (flash::canonical_warp_group_idx_nosync() == SchedulerFirstWG) {
+                cutlass::arch::NamedBarrier::arrive(
+                    2 * cutlass::NumThreadsPerWarpGroup,
+                    static_cast<uint32_t>(FwdNamedBarriers::WarpSchedulerWG1)
+                        + SchedulerFirstWG - 1 /*id*/);
             }
         }
 

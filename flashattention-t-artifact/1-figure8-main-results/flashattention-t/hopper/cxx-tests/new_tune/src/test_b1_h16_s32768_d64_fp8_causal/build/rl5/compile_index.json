@@ -1,0 +1,34 @@
+[
+  {
+    "target": "bm128_bn128_st2_prd24_cra240_p0_q0_nc2_sb0",
+    "source": "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/new_tune/src/test_b1_h16_s32768_d64_fp8_causal/cuda_source/bm128_bn128_st2_prd24_cra240_p0_q0_nc2_sb0.cu",
+    "source_sha256": "ba97d6797fc1bc57b20a9e99bc7a7897cb9736c3db1bcb0896e104c47edbdb59",
+    "register_usage_level": 5,
+    "status": "success",
+    "warnings": []
+  },
+  {
+    "target": "bm128_bn128_st2_prd24_cra240_p0_q1_nc2_sb0",
+    "source": "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/new_tune/src/test_b1_h16_s32768_d64_fp8_causal/cuda_source/bm128_bn128_st2_prd24_cra240_p0_q1_nc2_sb0.cu",
+    "source_sha256": "838ee54e23103c32d897850f547d66b29d09f28f26d090015f1a84e16c16c10d",
+    "register_usage_level": 5,
+    "status": "success",
+    "warnings": []
+  },
+  {
+    "target": "bm128_bn128_st2_prd24_cra240_p1_q0_nc2_sb0",
+    "source": "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/new_tune/src/test_b1_h16_s32768_d64_fp8_causal/cuda_source/bm128_bn128_st2_prd24_cra240_p1_q0_nc2_sb0.cu",
+    "source_sha256": "c8d75f0b00f61f01908918a20eab14e00a14e33b84bc87ab9933db85019ba132",
+    "register_usage_level": 5,
+    "status": "success",
+    "warnings": []
+  },
+  {
+    "target": "bm128_bn128_st2_prd24_cra240_p1_q1_nc2_sb0",
+    "source": "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/new_tune/src/test_b1_h16_s32768_d64_fp8_causal/cuda_source/bm128_bn128_st2_prd24_cra240_p1_q1_nc2_sb0.cu",
+    "source_sha256": "bb972c860024fdd597c7b24be97e6002bbddc0da58fad1851668afc6fa900a66",
+    "register_usage_level": 5,
+    "status": "success",
+    "warnings": []
+  }
+]

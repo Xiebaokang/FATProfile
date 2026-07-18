@@ -25,6 +25,10 @@
 #error "USE_MMA_SOFTMAX must be defined to use custom API"
 #endif
 
+#if USE_MMA_SOFTMAX && USE_MIX_WGMMA
+#error "USE_MMA_SOFTMAX and USE_MIX_WGMMA are independent experimental kernels; enable only one"
+#endif
+
 
 namespace flash {
 
@@ -83,12 +87,22 @@ public:
     static constexpr uint32_t NumMmaWarpGroups = CUTE_STATIC_V(size(TiledMmaPV{})) / cutlass::NumThreadsPerWarpGroup;
     static constexpr uint32_t MaxThreadsPerBlock = CUTE_STATIC_V(size(TiledMmaPV{})) + (NumLoadWarpGroups * cutlass::NumThreadsPerWarpGroup);
     static constexpr uint32_t MinBlocksPerMultiprocessor = 1;
-    static_assert(NumMmaWarpGroups == 1 || NumMmaWarpGroups == 2 || NumMmaWarpGroups == 3);
+#if USE_MIX_WGMMA
+    static_assert(NumMmaWarpGroups >= 1 && NumMmaWarpGroups <= 4);
+#else
+    static_assert(NumMmaWarpGroups >= 1 && NumMmaWarpGroups <= 3);
+#endif
 
     /// Register requirement for Load and Math WGs
     // If we use cp.async to load K and V, we need more registers for the producer WG.
+#if USE_MIX_WGMMA
+    static constexpr uint32_t LoadRegisterRequirement = CollectiveMainloop::LoadRegisterRequirement;
+    static constexpr uint32_t MmaRegisterRequirement = CollectiveMainloop::MmaRegisterRequirement;
+#else
     static constexpr uint32_t LoadRegisterRequirement = NumMmaWarpGroups == 1 ? 56 : (NumMmaWarpGroups == 2 ? (Use_TMA_KV ? 24 : 40) : 32);
     static constexpr uint32_t MmaRegisterRequirement = NumMmaWarpGroups == 1 ? 256 : (NumMmaWarpGroups == 2 ? (Use_TMA_KV ? 240 : 232) : 160);
+#endif
+
     // If you want to print from the producer warp, you'd need to increase the number of registers
     // Otherwise you'll get CUDA error.
     // static constexpr uint32_t LoadRegisterRequirement = 40;
@@ -377,9 +391,7 @@ public:
                         params.mainloop, pipeline_k_new, pipeline_v_new,
                         smem_pipe_write_new, shared_storage, seqlen_info, block_coord, work_idx);
                     if (tile_new_valid) {
-                        // if (threadIdx.x == 0) { printf("Producer: Before sync\n"); }
                         cutlass::arch::NamedBarrier::sync(NumMmaThreads + NumProducerThreads, static_cast<uint32_t>(FwdNamedBarriers::AppendKV) /*id*/);
-                        // if (threadIdx.x == 0) { printf("Producer: After sync\n"); }
                     }
                 }
                 auto scheduler_prefetch = [&scheduler, &params, &work_tile_info]() {
@@ -407,6 +419,16 @@ public:
             mainloop.mma_init();
 
             int work_idx = 0;
+#if USE_MIX_WGMMA
+            auto tRrQ = [&] {
+                if constexpr (CollectiveMainloop::HasQReg) {
+                    return mainloop.make_q_reg_fragment(threadIdx.x - MmaThreadOffset);
+                } else {
+                    return nullptr;
+                }
+            }();
+            bool q_regs_ready = false;
+#endif
             CUTLASS_PRAGMA_NO_UNROLL
             for (auto work_tile_info = scheduler.template get_initial_work</*IsProducerWarp=*/false>(params.scheduler);
                  work_tile_info.is_valid(params.scheduler);
@@ -428,12 +450,20 @@ public:
                     params.mainloop.seqused_q, params.mainloop.seqused_k, params.mainloop.leftpad_k,
                     params.mainloop.seqlens_rotary
                 };
+#if USE_MIX_WGMMA
+                if constexpr (CollectiveMainloop::HasQReg) {
+                    if (!q_regs_ready) {
+                        mainloop.load_q_regs(params.mainloop, tRrQ, seqlen_info, block_coord,
+                                             threadIdx.x - MmaThreadOffset);
+                    }
+                    q_regs_ready = false;
+                }
+#endif
                 if constexpr (AppendKV) {
                     bool tile_new_valid = mainloop.store_kv_new(
                         params.mainloop, pipeline_k_new, pipeline_v_new, smem_pipe_read_new,
                         threadIdx.x - MmaThreadOffset, shared_storage, seqlen_info, block_coord);
                     if (tile_new_valid) {
-                        // if (threadIdx.x == 128) { printf("Consumer: Before sync\n"); }
                         // We need this sync so that the gmem write from the consumers is visible to the producer
                         // that might do TMA read after that.
                         asm volatile ("fence.proxy.async.global;");
@@ -441,7 +471,6 @@ public:
                         // arrive is enough, we don't need sync. The producer will sync, which means
                         // after that sync we're guaranteed that the AppendKV pipeline have finished
                         // loading and consumer smem_k and smem_v.
-                        // if (threadIdx.x == 128) { printf("Consumer: After sync\n"); }
                     }
                 }
                 // If there's tanh softcap, the scaling will be done before tanh.
@@ -454,49 +483,53 @@ public:
                     softmax_scale_log2 *= q_descale * k_descale;
                 }
 
-                using AccOTraits = FlashFwdAccOTensorTraits<decltype(partition_fragment_C(TiledMmaPV{}, select<0, 1>(TileShape_MNK_PV{})))>;
-                using AccSTraits = FlashFwdAccSTensorTraits<decltype(partition_fragment_C(TiledMmaQK{}, select<0, 1>(TileShape_MNK{})))>;
-                // AccOTraits::printout_layout();
-                // AccSTraits::printout_layout();
                 static constexpr int kBlockM = get<0>(TileShape_MNK{});
-                static constexpr int kBlockN = get<1>(TileShape_MNK{});
 
-                #if USE_MMA_SOFTMAX
+#if USE_MMA_SOFTMAX
+                using AccSTraits = FlashFwdAccSTensorTraits<decltype(partition_fragment_C(TiledMmaQK{}, select<0, 1>(TileShape_MNK{})))>;
                 flash::WGMMAReduceSoftmax<
-                    AccSTraits, AccOTraits,
+                    AccSTraits,
                     !LargeHeadDimV ? 2 * (2 * kBlockM / NumMmaThreads) : 2,
                     /*Max_offset=*/!Is_FP8 ? 0 : 8
                 > softmax(
                     softmax_scale_log2
                 );
-                #else
+#else
                 flash::Softmax<!LargeHeadDimV ? 2 * (2 * kBlockM / NumMmaThreads) : 2, /*Max_offset=*/!Is_FP8 ? 0 : 8> softmax(softmax_scale_log2);
-                #endif
+#endif
                 // Attention output (GEMM-II) accumulator.
                 Tensor tOrO = partition_fragment_C(tiled_mma_pv, select<0, 1>(TileShape_MNK_PV{}));
                 bool tile_valid;
-                // CUSTOM NOTE: static constexpr bool LargeHeadDimV = kHeadDimV > 256;
-                // So for cases that we are interested in, LargeHeadDimV === false
                 if constexpr (!LargeHeadDimV) {
-                    #if USE_MMA_SOFTMAX
+#if USE_MMA_SOFTMAX
                     tile_valid = mainloop.mma_wgmma_reduce(
                         params.mainloop, pipeline_k, pipeline_v, smem_pipe_read,
-                        tOrO, softmax, threadIdx.x - MmaThreadOffset, work_idx, seqlen_info, block_coord, shared_storage);
-                    #else
+                        tOrO,
+                        softmax, threadIdx.x - MmaThreadOffset, work_idx, seqlen_info, block_coord, shared_storage);
+#elif USE_MIX_WGMMA
+                    tile_valid = mainloop.mma_mix_wgmma(
+                        params.mainloop, pipeline_k, pipeline_v, smem_pipe_read,
+                        tOrO, tRrQ,
+                        softmax, threadIdx.x - MmaThreadOffset, work_idx, seqlen_info, block_coord, shared_storage);
+#else
                     tile_valid = mainloop.mma(
                         params.mainloop, pipeline_k, pipeline_v, smem_pipe_read,
-                        tOrO, softmax, threadIdx.x - MmaThreadOffset, work_idx, seqlen_info, block_coord, shared_storage);
-                    #endif
+                        tOrO,
+                        softmax, threadIdx.x - MmaThreadOffset, work_idx, seqlen_info, block_coord, shared_storage);
+#endif
                 } else {  // mma_pv might not compile if !LargeHeadDimV
+#if !USE_MIX_WGMMA
                     if (warp_group_idx == 1) {
                         tile_valid = mainloop.mma(
                             params.mainloop, pipeline_k, pipeline_v, smem_pipe_read,
-                            tOrO, softmax, threadIdx.x - MmaThreadOffset, work_idx, seqlen_info, block_coord, shared_storage);
+                            tOrO,
+                            softmax, threadIdx.x - MmaThreadOffset, work_idx, seqlen_info, block_coord, shared_storage);
                     } else {
                         tile_valid = mainloop.mma_pv(
                             params.mainloop, pipeline_v, smem_pipe_read,
                             tOrO, softmax, threadIdx.x - MmaThreadOffset, seqlen_info, block_coord, shared_storage);
                     }
+#endif
                 }
                 // Do this here before the epilogue so that the next tile is ready to go.
                 work_tile_info = scheduler.template get_next_work</*IsProducerWarp=*/false>(params.scheduler, work_tile_info);
@@ -508,19 +541,48 @@ public:
                 #if USE_MMA_SOFTMAX
                 auto softmax_row_sum = softmax.get_row_sum();
                 #endif
+#if USE_MIX_WGMMA
+                auto prefetch_next_q = [&] {
+                    if constexpr (CollectiveMainloop::HasQReg) {
+                        if (work_tile_info.is_valid(params.scheduler)) {
+                            auto next_scheduler_block_coord = work_tile_info.get_block_coord(params.scheduler);
+                            auto next_block_coord = cute::make_tuple(
+                                get<0>(next_scheduler_block_coord), get<1>(next_scheduler_block_coord),
+                                get<2>(next_scheduler_block_coord), get<3>(next_scheduler_block_coord));
+                            SeqlenInfo_t next_seqlen_info{
+                                get<2>(next_block_coord),
+                                get<0>(params.mainloop.shape_Q),
+                                !params.mainloop.ptr_pagetable
+                                    ? size<0>(params.mainloop.shape_K)
+                                    : size<0>(params.mainloop.shape_K) * size<1>(params.mainloop.shape_pagetable),
+                                get<0>(params.mainloop.shape_K_new),
+                                params.mainloop.cu_seqlens_q, params.mainloop.cu_seqlens_k,
+                                params.mainloop.cu_seqlens_k_new, params.mainloop.seqused_q,
+                                params.mainloop.seqused_k, params.mainloop.leftpad_k,
+                                params.mainloop.seqlens_rotary};
+                            mainloop.load_q_regs(params.mainloop, tRrQ, next_seqlen_info,
+                                                 next_block_coord, threadIdx.x - MmaThreadOffset);
+                            q_regs_ready = true;
+                        }
+                    }
+                };
+#endif
                 if (tile_valid) {
-                    #if USE_MMA_SOFTMAX
-                    
-                    // if (threadIdx.x == 128) { printf("Before epilogue, bid.x = %d, bid.y = %d, bid.z = %d, m_block = %d, bidb = %d, split_idx = %d\n", blockIdx.x, blockIdx.y, blockIdx.z, m_block, bidb, split_idx); }
+#if USE_MMA_SOFTMAX
                     epilogue.store(params.epilogue, tOrO, softmax_row_sum, shared_storage, tiled_mma_pv,
-                        threadIdx.x - MmaThreadOffset, block_coord);
-                    #else
-                    // if (threadIdx.x == 128) { printf("Before epilogue, bid.x = %d, bid.y = %d, bid.z = %d, m_block = %d, bidb = %d, split_idx = %d\n", blockIdx.x, blockIdx.y, blockIdx.z, m_block, bidb, split_idx); }
+                                   threadIdx.x - MmaThreadOffset, block_coord);
+#elif USE_MIX_WGMMA
+                    epilogue.store(params.epilogue, tOrO, softmax.row_sum, shared_storage, tiled_mma_pv,
+                                   threadIdx.x - MmaThreadOffset, block_coord, prefetch_next_q);
+#else
                     epilogue.store(params.epilogue, tOrO, softmax.row_sum, shared_storage, tiled_mma_pv,
                                    threadIdx.x - MmaThreadOffset, block_coord);
-                    #endif     
+#endif
                 } else {
                     // Write 0 to gO and -inf to gLSE.
+#if USE_MIX_WGMMA
+                    prefetch_next_q();
+#endif
                     epilogue.store_zero(params.epilogue, threadIdx.x - MmaThreadOffset, block_coord);
                 }
             }

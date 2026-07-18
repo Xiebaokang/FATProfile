@@ -47,6 +47,7 @@ constexpr bool GetRescaleOBeforeGemm = HasRescaleOBeforeGemm<T>::value;
 template <typename T>
 constexpr bool GetRescaleOBeforeGemmExists = HasRescaleOBeforeGemm<T>::exists;
 
+#if !USE_MIX_WGMMA
 template <int Arch, int kHeadDim, int kHeadDimV, int ClusterM, typename Element, typename ElementOut,
           bool Is_causal, bool Is_local, bool Has_softcap, bool Varlen, bool PagedKVNonTMA, bool AppendKV, bool HasQv,
           bool PackGQA, bool Split, bool V_colmajor>
@@ -67,7 +68,7 @@ void run_flash_fwd(Flash_fwd_params &params, cudaStream_t stream) {
     static constexpr bool MmaPV_is_RS = std::get<2>(kBlockMN_RS_IntraWGOverlap);
 
     static constexpr bool IntraWGOverlap = std::get<3>(kBlockMN_RS_IntraWGOverlap);
-    
+
     static constexpr int kNWarps = std::get<2>(kBlockMN_kNWarps_Stages_RS);
     // 这个对应NUM_SMEM，而num_stage固定为2
     static constexpr int kStages = Arch >= 90 ? 2 : std::get<3>(kBlockMN_kNWarps_Stages_RS);
@@ -272,6 +273,7 @@ void run_mha_fwd_(Flash_fwd_params &params, cudaStream_t stream) {
         });
     });
 }
+#endif  // !USE_MIX_WGMMA
 
 
 ////////// CUSTOM API //////////
@@ -281,10 +283,15 @@ void run_mha_fwd_(Flash_fwd_params &params, cudaStream_t stream) {
 #endif
 
 
-
+#if USE_MIX_WGMMA
+template <int Arch, auto Config, int kHeadDim, int kHeadDimV, int ClusterM, typename Element, typename ElementOut,
+          bool Is_causal, bool Is_local, bool Has_softcap, bool Varlen, bool PagedKVNonTMA, bool AppendKV, bool HasQv,
+          bool PackGQA, bool Split, bool V_colmajor>
+#else
 template <int Arch, int kHeadDim, int kHeadDimV, int ClusterM, typename Element, typename ElementOut,
           bool Is_causal, bool Is_local, bool Has_softcap, bool Varlen, bool PagedKVNonTMA, bool AppendKV, bool HasQv,
           bool PackGQA, bool Split, bool V_colmajor>
+#endif
 void run_flash_fwd_custom(Flash_fwd_params &params, cudaStream_t stream) {
     static_assert(!(Is_causal && Is_local), "Causal and Local cannot be enabled at the same time");
     static_assert(!(AppendKV && V_colmajor), "AppendKV and V_colmajor cannot be enabled at the same time");
@@ -298,22 +305,44 @@ void run_flash_fwd_custom(Flash_fwd_params &params, cudaStream_t stream) {
     static_assert(Arch >= 90, "Custom API only supports SM90");
     using ArchTag = std::conditional_t<Arch >= 90, cutlass::arch::Sm90, cutlass::arch::Sm80>;
 
-    // Can't use structured binding since it's not compatible with constexpr
+
+#if USE_MIX_WGMMA
+    // Mixed PV placement is controlled exclusively by Config.p_smem_k_tiles.
+    // Do not couple it to the stock tile-size heuristic, whose BM/BN are not
+    // used by this branch.
+    static constexpr bool MmaPV_is_RS = true;
+    static constexpr int kStages = Config.kStage;
+    static constexpr int kBlockM = Config.kBlockM;
+    static constexpr int kBlockN = Config.kBlockN;
+    static constexpr int kMmaK = Is_FP8 ? 32 : 16;
+
+    static_assert(kStages > 0, "kStage must be positive");
+    static_assert(kBlockM > 0 && kBlockM % 64 == 0,
+                  "kBlockM must be a positive multiple of 64");
+    static_assert(kBlockN > 0 && kBlockN % kMmaK == 0,
+                  "kBlockN must be a positive multiple of the input MMA-K");
+    static_assert(Config.num_consumer == kBlockM / 64,
+                  "num_consumer must match kBlockM / 64");
+
+    static constexpr bool IntraWGOverlap = true;
+#else
+    // Can't use structured binding since it's not compatible with constexpr.
     static constexpr std::tuple<int, int, bool, bool> kBlockMN_RS_IntraWGOverlap = tile_size_fwd_sm90(kHeadDim, kHeadDimV, Is_causal, Is_local, sizeof(Element) /*element_size*/, V_colmajor, PagedKVNonTMA, Has_softcap);
     static constexpr std::tuple<int, int, int, int, bool> kBlockMN_kNWarps_Stages_RS = tile_size_fwd_sm8x(Arch == 86 || Arch == 89, kHeadDim, kHeadDimV, Is_causal, Is_local, sizeof(Element) /*element_size*/, PagedKVNonTMA, Varlen && Split, Has_softcap, AppendKV);
     static constexpr int kNWarps = std::get<2>(kBlockMN_kNWarps_Stages_RS);
-    static constexpr int kStages = Arch >= 90 ? 2 : std::get<3>(kBlockMN_kNWarps_Stages_RS);
     static constexpr bool Q_in_regs = Arch >= 90 ? false : std::get<4>(kBlockMN_kNWarps_Stages_RS);
-
+    static constexpr bool MmaPV_is_RS = std::get<2>(kBlockMN_RS_IntraWGOverlap);
+    static constexpr int kStages = Arch >= 90 ? 2 : std::get<3>(kBlockMN_kNWarps_Stages_RS);
     static constexpr int kBlockM = Arch >= 90 ? std::get<0>(kBlockMN_RS_IntraWGOverlap) : std::get<0>(kBlockMN_kNWarps_Stages_RS);
     static constexpr int kBlockN = Arch >= 90 ? std::get<1>(kBlockMN_RS_IntraWGOverlap) : std::get<1>(kBlockMN_kNWarps_Stages_RS);
-    static constexpr bool MmaPV_is_RS = std::get<2>(kBlockMN_RS_IntraWGOverlap);
 
     #if ENABLE_CUSTOM_SM90_INTRAWG_ONLY_OVERRIDE
     static constexpr bool IntraWGOverlap = CUSTOM_OVERRIDE_INTRA_WG;
     #else
     static constexpr bool IntraWGOverlap = std::get<3>(kBlockMN_RS_IntraWGOverlap);
     #endif
+#endif
+
 
     using TileShape_MNK = cute::Shape<Int<kBlockM>, Int<kBlockN>, Int<kHeadDim>>;
     using TileShape_MNK_PV = cute::Shape<Int<kBlockM>, Int<kHeadDimV>, Int<kBlockN>>;
@@ -322,19 +351,51 @@ void run_flash_fwd_custom(Flash_fwd_params &params, cudaStream_t stream) {
     #if ENABLE_CUSTOM_FWD_LAUNCH_TEMPLATE_REPORT
     std::printf("Custom Report: run_flash_fwd CollectiveMainLoop Config:\n");
     std::printf("BlockM = %d, BlockN = %d, HeadDim = %d, HeadDimV = %d\n", kBlockM, kBlockN, kHeadDim, kHeadDimV);
-    std::printf("MmaPV_is_RS = %d, IntraWGOverlap = %d, Q_in_regs = %d\n", MmaPV_is_RS, IntraWGOverlap, Q_in_regs); 
+#if USE_MIX_WGMMA
+    std::printf("MmaPV_is_RS = %d, IntraWGOverlap = %d\n", MmaPV_is_RS, IntraWGOverlap);
+#else
+    std::printf("MmaPV_is_RS = %d, IntraWGOverlap = %d, Q_in_regs = %d\n", MmaPV_is_RS, IntraWGOverlap, Q_in_regs);
+#endif
     std::printf("TileShape_MNK = (%d, %d, %d)\n", kBlockM, kBlockN, kHeadDim);
     std::printf("TileShape_MNK_PV = (%d, %d, %d)\n", kBlockM, kHeadDimV, kBlockN);
+#if USE_MIX_WGMMA
+    std::printf("ProducerRegDealloc = %d, ConsumerRegAlloc = %d, NumConsumer = %d\n",
+                Config.producer_reg_dealloc, Config.consumer_reg_alloc, Config.num_consumer);
+    std::printf("PSmemKTiles = %d, QRegKTiles = %d, UseSchedulerBarrier = %d\n",
+                Config.p_smem_k_tiles, Config.q_reg_k_tiles,
+                Config.use_scheduler_barrier);
+#endif
     // flash::CollectiveMainloopFwdSm90<kStages, ClusterShape, TileShape_MNK, kHeadDimV, Element, float, cutlass::arch::Sm90, Is_causal, Is_local, Has_softcap, Varlen, PagedKVNonTMA, AppendKV, HasQv, MmaPV_is_RS, IntraWGOverlap, PackGQA, Split, V_colmajor>
     std::printf("Is_causal = %d, Is_local = %d, Has_softcap = %d, Varlen = %d, PagedKVNonTMA = %d, AppendKV = %d, HasQv = %d, MmaPV_is_RS = %d, IntraWGOverlap = %d, PackGQA = %d, Split = %d, V_colmajor = %d\n",
                 Is_causal, Is_local, Has_softcap, Varlen, PagedKVNonTMA, AppendKV, HasQv, MmaPV_is_RS, IntraWGOverlap, PackGQA, Split, V_colmajor);
     #endif
 
+#if USE_MIX_WGMMA
+    using CollectiveMainloop = flash::CollectiveMainloopFwdSm90<
+        Config,
+        kStages, ClusterShape, TileShape_MNK, kHeadDimV, Element, float,
+        cutlass::arch::Sm90, Is_causal, Is_local, Has_softcap, Varlen,
+        PagedKVNonTMA, AppendKV, HasQv, MmaPV_is_RS, IntraWGOverlap,
+        PackGQA, Split, V_colmajor>;
+
+    using CollectiveEpilogue = flash::CollectiveEpilogueFwd<
+        TileShape_MNK_PV, ClusterShape, ElementOut, ArchTag,
+        CollectiveMainloop::NumMmaThreads, Varlen, PackGQA, Split, FP8_TransposeV>;
+
+    using Scheduler = std::conditional_t<!Is_causal && !Is_local,
+            flash::StaticPersistentTileScheduler<Split>,
+            flash::DynamicPersistentTileScheduler<CollectiveMainloop::NumMmaThreads, CollectiveMainloop::NumProducerThreads, Split, PackGQA, true /*WarpSpecialized*/>
+        >;
+
+    using AttnKernel = flash::enable_sm90_or_later<flash::FlashAttnFwdSm90<CollectiveMainloop, CollectiveEpilogue, Scheduler>>;
+
+#else
     using CollectiveMainloop = std::conditional_t<
         Arch >= 90,
         flash::CollectiveMainloopFwdSm90<kStages, ClusterShape, TileShape_MNK, kHeadDimV, Element, float, cutlass::arch::Sm90, Is_causal, Is_local, Has_softcap, Varlen, PagedKVNonTMA, AppendKV, HasQv, MmaPV_is_RS, IntraWGOverlap, PackGQA, Split, V_colmajor>,
         flash::CollectiveMainloopFwdSm80<kNWarps, kStages, Q_in_regs, TileShape_MNK, kHeadDimV, Element, float, cutlass::arch::Sm80, Is_causal, Is_local, Has_softcap, Varlen, PagedKVNonTMA, AppendKV, PackGQA, Split>
     >;
+
     using CollectiveEpilogue = flash::CollectiveEpilogueFwd<TileShape_MNK_PV, ClusterShape, ElementOut, ArchTag, CollectiveMainloop::NumMmaThreads, Varlen, PackGQA, Split, FP8_TransposeV>;
 
     static constexpr int NumProducerThreads = Arch >= 90 ? CollectiveMainloop::NumProducerThreads : CollectiveMainloop::NumMmaThreads;
@@ -357,6 +418,7 @@ void run_flash_fwd_custom(Flash_fwd_params &params, cudaStream_t stream) {
         flash::enable_sm90_or_later<flash::FlashAttnFwdSm90<CollectiveMainloop, CollectiveEpilogue, Scheduler>>,
         flash::enable_sm80_to_sm89<flash::FlashAttnFwdSm80<CollectiveMainloop, CollectiveEpilogue, Scheduler>>
     >;
+#endif
 
     bool const is_varlen_q = params.cu_seqlens_q;
     bool const is_varlen_k = params.cu_seqlens_k;
@@ -487,6 +549,47 @@ void run_flash_fwd_custom(Flash_fwd_params &params, cudaStream_t stream) {
     CHECK_CUDA_KERNEL_LAUNCH();
 }
 
+
+#if USE_MIX_WGMMA
+// The tuning binaries know all supported dispatch flags at compile time.  Keep
+// only the optional cluster specialization here instead of instantiating the
+// generic causal/local/varlen/append-QV dispatch tree for every candidate.
+template<int Arch, auto Config, typename T, int kHeadDim, int kHeadDimV, bool IsCausal>
+void run_mha_fwd_custom_fixed_(Flash_fwd_params &params, cudaStream_t stream) {
+    static_assert(Arch == 90, "USE_MIX_WGMMA fixed dispatch only supports SM90");
+    static_assert(sizeof(T) == 1 || sizeof(T) == 2, "Only FP8 and FP16 are supported");
+    static_assert(kHeadDim == kHeadDimV,
+                  "USE_MIX_WGMMA fixed dispatch requires equal QK and V head dimensions");
+
+    static constexpr bool Is_FP8 = cute::is_same_v<T, cutlass::float_e4m3_t> ||
+                                   cute::is_same_v<T, cutlass::float_e5m2_t>;
+    using T_out = std::conditional_t<!Is_FP8, T, cutlass::bfloat16_t>;
+    static constexpr bool EnableCluster =
+        (sizeof(T) == 2 ? kHeadDim >= 128 : kHeadDim == 192) && !IsCausal;
+
+    VCOLMAJOR_SWITCH(params.v_dim_stride != 1, V_colmajor_, [&] {
+        static constexpr bool V_colmajor = V_colmajor_ && Is_FP8;
+        if constexpr (EnableCluster) {
+            CLUSTER_SWITCH(
+                cutlass::ceil_div(params.seqlen_q, Config.kBlockM) % 2 == 0,
+                UseCluster,
+                [&] {
+                    static constexpr int ClusterM = UseCluster ? 2 : 1;
+                    run_flash_fwd_custom<
+                        Arch, Config, kHeadDim, kHeadDimV, ClusterM, T, T_out,
+                        IsCausal, false, false, false, false, false, false, false,
+                        false, V_colmajor>(params, stream);
+                });
+        } else {
+            run_flash_fwd_custom<
+                Arch, Config, kHeadDim, kHeadDimV, 1, T, T_out,
+                IsCausal, false, false, false, false, false, false, false,
+                false, V_colmajor>(params, stream);
+        }
+    });
+}
+
+#else
 template<int Arch, typename T, int kHeadDim, int kHeadDimV, bool Split, bool PagedKVNonTMA, bool Has_softcap, bool PackGQA>
 void run_mha_fwd_custom_(Flash_fwd_params &params, cudaStream_t stream) {
     static_assert(sizeof(T) == 2 || sizeof(T) == 1, "Only 16bit and 8bit are supported");
@@ -515,3 +618,4 @@ void run_mha_fwd_custom_(Flash_fwd_params &params, cudaStream_t stream) {
         });
     });
 }
+#endif  // USE_MIX_WGMMA

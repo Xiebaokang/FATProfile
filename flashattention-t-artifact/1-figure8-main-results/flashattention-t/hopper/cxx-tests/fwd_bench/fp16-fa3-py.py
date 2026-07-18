@@ -4,52 +4,33 @@ import torch
 import flash_attn_interface
 
 
-SHAPES = [
-    # batchsize, nheads, seqlen, headdim, is_causal
-    (128, 32,   128,  64, 0),
-    ( 64, 32,   256,  64, 0),
-    ( 32, 32,   512,  64, 0),
-    ( 16, 32,  1024,  64, 0),
-    (  8, 32,  2048,  64, 0),
-    (  4, 32,  4096,  64, 0),
-    (  2, 32,  8192,  64, 0),
-    (  1, 32, 16384,  64, 0),
+DEFAULT_SHAPES = [(1, 16, 32768, 256, 0)]
 
-    (128, 16,   128, 128, 0),
-    ( 64, 16,   256, 128, 0),
-    ( 32, 16,   512, 128, 0),
-    ( 16, 16,  1024, 128, 0),
-    (  8, 16,  2048, 128, 0),
-    (  4, 16,  4096, 128, 0),
-    (  2, 16,  8192, 128, 0),
-    (  1, 16, 16384, 128, 0),
 
-    (128, 32,   128,  64, 1),
-    ( 64, 32,   256,  64, 1),
-    ( 32, 32,   512,  64, 1),
-    ( 16, 32,  1024,  64, 1),
-    (  8, 32,  2048,  64, 1),
-    (  4, 32,  4096,  64, 1),
-    (  2, 32,  8192,  64, 1),
-    (  1, 32, 16384,  64, 1),
-
-    (128, 16,   128, 128, 1),
-    ( 64, 16,   256, 128, 1),
-    ( 32, 16,   512, 128, 1),
-    ( 16, 16,  1024, 128, 1),
-    (  8, 16,  2048, 128, 1),
-    (  4, 16,  4096, 128, 1),
-    (  2, 16,  8192, 128, 1),
-    (  1, 16, 16384, 128, 1),
-]
+def parse_shape(value):
+    try:
+        fields = tuple(int(field) for field in value.split(","))
+    except ValueError as error:
+        raise argparse.ArgumentTypeError("shape fields must be integers") from error
+    if len(fields) != 5:
+        raise argparse.ArgumentTypeError("shape must be B,H,S,D,causal")
+    if any(field <= 0 for field in fields[:4]) or fields[4] not in (0, 1):
+        raise argparse.ArgumentTypeError(
+            "B/H/S/D must be positive and causal must be 0 or 1"
+        )
+    return fields
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--warmup", type=int, default=20)
-    parser.add_argument("--iters", type=int, default=200)
+    parser.add_argument("--iters", type=int, default=250)
     parser.add_argument("--output", type=str, default="fa3_fp16_results.csv")
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument(
+        "--shape", type=parse_shape, action="append",
+        help="repeatable B,H,S,D,causal override (default: 1,16,32768,128,0)",
+    )
     return parser.parse_args()
 
 
@@ -109,13 +90,18 @@ def benchmark_one_shape(batchsize, nheads, seqlen, headdim, is_causal, warmup, i
 
 def main():
     args = parse_args()
+    if args.warmup < 0:
+        raise ValueError("--warmup must be non-negative")
+    if args.iters <= 0:
+        raise ValueError("--iters must be positive")
+    shapes = args.shape or DEFAULT_SHAPES
 
     torch.manual_seed(args.seed)
     torch.cuda.manual_seed_all(args.seed)
 
     rows = []
 
-    for batchsize, nheads, seqlen, headdim, is_causal in SHAPES:
+    for batchsize, nheads, seqlen, headdim, is_causal in shapes:
         print(
             f"Running: B={batchsize}, H={nheads}, "
             f"S={seqlen}, D={headdim}, causal={is_causal}"

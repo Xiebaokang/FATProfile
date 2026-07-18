@@ -1,0 +1,35 @@
+stage 1 / base structure: 3958 configs, register-usage-level=5
+CUDA sources: 846 generated, 3112 cached
++ cmake -Wno-dev -S /home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/new_tune/src/test_b1_h16_s30720_d64_fp16_causal/build/project_rl5 -B /home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/new_tune/src/test_b1_h16_s30720_d64_fp16_causal/build/rl5 -DCMAKE_BUILD_TYPE=Release -DCMAKE_CUDA_ARCHITECTURES=90a
+-- The CXX compiler identification is GNU 11.4.0
+-- The CUDA compiler identification is NVIDIA 12.8.61 with host compiler GNU 11.4.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Detecting CUDA compiler ABI info
+Traceback (most recent call last):
+  File "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/new_tune/tune.py", line 195, in <module>
+    tune(shape=(1, 16, 30720, 64), dtype=DType.FP16, causal=True)
+  File "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/new_tune/tune.py", line 122, in tune
+    ret1 = _run_stage(
+  File "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/new_tune/tune.py", line 53, in _run_stage
+    return run_interface(
+  File "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/new_tune/interface.py", line 576, in run_interface
+    compiled = compile_interface(
+  File "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/new_tune/interface.py", line 393, in compile_interface
+    executables = build_source(
+  File "/home/xiebaokang/projects/cuda/test/microbenchmarks/FATProfile/flashattention-t-artifact/1-figure8-main-results/flashattention-t/hopper/cxx-tests/new_tune/interface.py", line 246, in build_source
+    subprocess.run(configure, check=True)
+  File "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/subprocess.py", line 505, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+  File "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/subprocess.py", line 1146, in communicate
+    self.wait()
+  File "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/subprocess.py", line 1209, in wait
+    return self._wait(timeout=timeout)
+  File "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/subprocess.py", line 1959, in _wait
+    (pid, sts) = self._try_wait(0)
+  File "/home/xiebaokang/miniconda3/envs/torch/lib/python3.10/subprocess.py", line 1917, in _try_wait
+    (pid, sts) = os.waitpid(self.pid, wait_flags)
+KeyboardInterrupt

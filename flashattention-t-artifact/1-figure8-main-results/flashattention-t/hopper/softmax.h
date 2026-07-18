@@ -134,6 +134,22 @@ struct Softmax {
         flash::reduce_sum</*zero_init=*/Is_first, /*warp_reduce=*/false>(scores, row_sum);
     };
 
+    template<bool Check_inf=false, typename Tensor0>
+    __forceinline__ __device__ void online_softmax_exp(Tensor0 &acc_s) {
+        // Reshape acc_s from ((2, 2, V), MMA_M, MMA_N) to (nrow=(2, MMA_M), ncol=(2, V, MMA_N))
+        Tensor scores = make_tensor(acc_s.data(), flash::convert_layout_acc_rowcol(acc_s.layout()));
+        static_assert(CUTE_STATIC_V(size<0>(scores)) == kNRows);
+        flash::template scale_apply_exp2</*Scale_max=*/true, Check_inf, Max_offset>(
+            scores, row_max, softmax_scale_log2);
+    };
+
+    template<bool Is_first, typename Tensor0>
+    __forceinline__ __device__ void online_softmax_reduce(Tensor0 &acc_s) {
+        // This must see the same accumulator layout produced by online_softmax_exp.
+        Tensor scores = make_tensor(acc_s.data(), flash::convert_layout_acc_rowcol(acc_s.layout()));
+        static_assert(CUTE_STATIC_V(size<0>(scores)) == kNRows);
+        flash::reduce_sum</*zero_init=*/Is_first, /*warp_reduce=*/false>(scores, row_sum);
+    };
     __forceinline__ __device__ TensorT finalize(float const final_scale=1.f) {
         SumOp<float> sum_op;
         quad_allreduce_(row_sum, row_sum, sum_op);

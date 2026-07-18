@@ -210,7 +210,11 @@ struct CollectiveEpilogueFwd {
         }
     }
 
-    template <typename SharedStorage, typename FrgTensorO, typename FrgTensorLSE, typename TiledMma>
+    template <typename SharedStorage, typename FrgTensorO, typename FrgTensorLSE, typename TiledMma
+#if USE_MIX_WGMMA
+              , typename PrefetchQ
+#endif
+              >
     CUTLASS_DEVICE void
     store(Params const& params,
           FrgTensorO& tOrO,
@@ -219,6 +223,9 @@ struct CollectiveEpilogueFwd {
           TiledMma tiled_mma,
           int thread_idx,
           cute::tuple<int32_t, int32_t, int32_t, int32_t> const& block_coord
+#if USE_MIX_WGMMA
+          , PrefetchQ const& prefetch_q
+#endif
           ) {
 
         auto [m_block, bidh, bidb, split_idx] = block_coord;
@@ -271,6 +278,13 @@ struct CollectiveEpilogueFwd {
                 }
             }
         }
+
+#if USE_MIX_WGMMA
+        // Current O no longer needs its accumulator registers after R2S. Load
+        // the next persistent tile's RS-Q fragment while LSE and O are written
+        // back, avoiding overlap with the peak tOrO register live range.
+        prefetch_q();
+#endif
 
         flash::SeqlenInfo<Varlen, kBlockM> seqlen_info{bidb, size<0>(params.shape_O), params.cu_seqlens, params.seqused};
         bool is_varlen = Varlen && params.cu_seqlens;

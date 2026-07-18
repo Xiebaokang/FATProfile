@@ -749,6 +749,7 @@ std::vector<at::Tensor> custom_mha_fwd_template_core(
     }
   }
 
+#if !USE_MIX_WGMMA
   #ifdef FLASHATTENTION_DISABLE_LOCAL
   TORCH_CHECK(!params.is_local, "This flash attention build does not support local attention.");
   #endif
@@ -767,47 +768,51 @@ std::vector<at::Tensor> custom_mha_fwd_template_core(
   #ifdef FLASHATTENTION_DISABLE_APPENDKV
   // TORCH_CHECK(!k_new_.has_value(), "This flash attention build does not support appending KV.");
   #endif
-
-  //////// CUSTOM CHECK
-  // 1. no split
-  TORCH_CHECK(params.num_splits == 1, "This flash attention build does not support split");
-  // 2. no pagedKV
-  TORCH_CHECK(!params.pagedkv_tma, "This flash attention build does not support paged KV");
-  // 3. no softcap
-  TORCH_CHECK(params.softcap == 0.0, "This flash attention build does not support softcap");
-  // 4. no packGQA
-  TORCH_CHECK(!params.pack_gqa, "This flash attention build does not support packGQA");
+#else
+  TORCH_CHECK(params.num_splits == 1, "USE_MIX_WGMMA does not support split attention");
+  TORCH_CHECK(!params.page_table, "USE_MIX_WGMMA does not support paged KV");
+  TORCH_CHECK(params.softcap == 0.0, "USE_MIX_WGMMA does not support softcap");
+  TORCH_CHECK(!params.pack_gqa, "USE_MIX_WGMMA does not support PackGQA");
+  TORCH_CHECK(!params.is_local, "USE_MIX_WGMMA does not support local attention");
+  TORCH_CHECK(
+    !params.cu_seqlens_q && !params.cu_seqlens_k &&
+    !params.seqused_q && !params.seqused_k && !params.leftpad_k,
+    "USE_MIX_WGMMA only supports fixed-length attention"
+  );
+  TORCH_CHECK(!params.knew_ptr, "USE_MIX_WGMMA does not support appended KV");
+  TORCH_CHECK(!params.qv_ptr, "USE_MIX_WGMMA does not support QV");
+#endif
 
   if (total_q > 0 && (total_k + params.total_knew) > 0 && num_heads_k > 0) {
     auto stream = at::cuda::getCurrentCUDAStream().stream();
+#if USE_MIX_WGMMA
+    static_assert(HeadDim == HeadDimV,
+                  "USE_MIX_WGMMA custom API requires HeadDim == HeadDimV");
+#endif
     // NOTE: fa3 api would round BOTH HeadDim and HeadDimV to 64
     if constexpr (HeadDimV <= 64 || HeadDim <= 64) {
+#if USE_MIX_WGMMA
+      run_mha_fwd_custom_fixed_<90, Config, Dtype, /*HeadDim=*/64, /*kHeadDimV=*/64, IsCausal>(
+        params, stream
+      );
+#else
       run_mha_fwd_custom_<90, Dtype, /*HeadDim=*/64, /*kHeadDimV=*/64, false, false, false, false>(
         params, stream
       );
+#endif
     } else {
+#if USE_MIX_WGMMA
+      run_mha_fwd_custom_fixed_<90, Config, Dtype, HeadDim, HeadDimV, IsCausal>(
+        params, stream
+      );
+#else
       run_mha_fwd_custom_<90, Dtype, HeadDim, HeadDimV, false, false, false, false>(
         params, stream
       );
+#endif
     }
     
-    if (/*params.num_splits > 1*/ false) {
-      // if (out_type == at::ScalarType::BFloat16) {
-      //     // Since we want output in BF16. Otherwise fwd_combine will output to FP16
-      //     params.is_bf16 = true;
-      // }
-      // // Unless there's seqused_q, for the purpose of attn_combine, we can just treat it as batch=1
-      // // and seqlen = total_q, and don't need to dispatch to Varlen there.
-      // // However, with dynamic split, each row needs to know which batch it belongs to
-      // // to read the number of splits, so we just use the varlen version of combine kernel.
-      // // if (is_varlen_q && !seqused_q_.has_value()) {
-      // // if (is_varlen_q) {
-      // //     params.b = 1;
-      // //     params.seqlen_q = total_q;
-      // // }
-      // // This will zero out the semaphore if needed
-      // run_mha_fwd_combine(params, stream, true /*enable_pdl*/);
-    } else if (scheduler_needs_semaphore && params.skip_scheduler_metadata_computation) {
+    if (scheduler_needs_semaphore && params.skip_scheduler_metadata_computation) {
       // need to zero out the semaphore in this case
       tile_count_semaphore.index({torch::indexing::Slice(0, 1)}).zero_();
     }
